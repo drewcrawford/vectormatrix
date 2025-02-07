@@ -488,6 +488,18 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
     }
 }
 
+//dot product
+impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
+{
+    #[inline] pub fn dot(self, other: Self) -> T {
+        let mut result = self.0[0].clone() * other.0[0].clone();
+        for i in 1..N {
+            result = result + self.0[i].clone() * other.0[i].clone();
+        }
+        result
+    }
+}
+
 
 #[cfg(test)] mod tests {
     use crate::vec::Vector;
@@ -604,6 +616,13 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
         let b = Vector::new([4,5,6]);
         let c = a.cross(b);
         assert_eq!(c.0, [-3,6,-3]);
+    }
+
+    #[test] fn test_dot() {
+        let a = Vector::new([1,2,3]);
+        let b = Vector::new([4,5,6]);
+        let c = a.dot(b);
+        assert_eq!(c, 32);
     }
 
 
