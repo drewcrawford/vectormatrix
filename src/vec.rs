@@ -407,6 +407,13 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
     }
 }
 
+//norm
+impl <T: core::ops::Div<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vec<T, N> {
+    #[inline] pub fn normalize(self) -> Self {
+        self / self.length()
+    }
+}
+
 
 #[cfg(test)] mod tests {
     use crate::vec::Vec;
@@ -491,6 +498,12 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
         let a = Vec::new([1.0,2.0]);
         let b = Vec::new([4.0,6.0]);
         assert_eq!(a.euclid_distance_to(b), 5.0);
+    }
+
+    #[test] fn normalize() {
+        let a = Vec::new([3.0,4.0]);
+        let b = a.normalize();
+        assert_eq!(b.length(), 1.0);
     }
 
 
