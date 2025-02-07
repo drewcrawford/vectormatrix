@@ -500,6 +500,23 @@ impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, con
     }
 }
 
+//clamp
+impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
+{
+    #[inline] pub fn clamp(self, min: T, max: T) -> Self {
+        let mut result = self.0.clone();
+        for i in 0..N {
+            if result[i].clone() < min.clone() {
+                result[i] = min.clone();
+            }
+            else if result[i].clone() > max.clone() {
+                result[i] = max.clone();
+            }
+        }
+        Self(result)
+    }
+}
+
 
 #[cfg(test)] mod tests {
     use crate::vec::Vector;
@@ -623,6 +640,12 @@ impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, con
         let b = Vector::new([4,5,6]);
         let c = a.dot(b);
         assert_eq!(c, 32);
+    }
+
+    #[test] fn test_clamp() {
+        let a = Vector::new([1,2,3,4]);
+        let b = a.clamp(2, 3);
+        assert_eq!(b.0, [2,2,3,3]);
     }
 
 
