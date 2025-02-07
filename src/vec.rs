@@ -442,6 +442,18 @@ where
     }
 }
 
+//eq_approx
+impl <T: Float + Clone, const N: usize>  Vector<T, N> {
+    #[inline] pub fn eq_approx(self, other: Self, tolerance: T) -> bool {
+        for i in 0..N {
+            if !self.0[i].clone().eq_approx(other.0[i].clone(), tolerance.clone()) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 //min, max
 impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
     #[inline] pub fn max(self) -> T {
@@ -567,6 +579,14 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
         let a = Vector::new([1,2,3]);
         assert_eq!(a.min(), 1);
         assert_eq!(a.max(), 3);
+    }
+
+    #[test] fn eq_approx() {
+        let a = Vector::new([1.0,2.0,3.0]);
+        let b = Vector::new([1.0,2.005,3.0]);
+        assert!(a.eq_approx(b, 0.01));
+        assert!(!a.eq_approx(b, 0.001));
+
     }
 
 
