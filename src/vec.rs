@@ -517,6 +517,18 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
     }
 }
 
+//mix
+impl <T: Float + Constants + Clone + core::ops::Sub<Output=T> + core::ops::Mul<Output=T> + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
+{
+    #[inline] pub fn mix(self, other: Self, weight: T) -> Self {
+        let mut result = self.0.clone();
+        for i in 0..N {
+            result[i] = self.0[i].clone() * (T::ONE - weight.clone()) + other.0[i].clone() * weight.clone();
+        }
+        Self(result)
+    }
+}
+
 
 #[cfg(test)] mod tests {
     use crate::vec::Vector;
@@ -646,6 +658,12 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
         let a = Vector::new([1,2,3,4]);
         let b = a.clamp(2, 3);
         assert_eq!(b.0, [2,2,3,3]);
+    }
+
+    #[test] fn test_mix() {
+        let a = Vector::new([1.0f32,2.0,3.0,4.0]);
+        let b = a.mix(Vector::new([4.0f32,3.0,2.0,1.0]), 0.5);
+        assert_eq!(b.0, [2.5,2.5,2.5,2.5]);
     }
 
 
