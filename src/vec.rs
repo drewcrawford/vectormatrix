@@ -442,6 +442,29 @@ where
     }
 }
 
+//min, max
+impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
+    #[inline] pub fn max(self) -> T {
+        let mut result = self.0[0].clone();
+        for i in 1..N {
+            if self.0[i].clone() > result {
+                result = self.0[i].clone();
+            }
+        }
+        result
+    }
+
+    #[inline] pub fn min(self) -> T {
+        let mut result = self.0[0].clone();
+        for i in 1..N {
+            if self.0[i].clone() < result {
+                result = self.0[i].clone();
+            }
+        }
+        result
+    }
+}
+
 
 #[cfg(test)] mod tests {
     use crate::vec::Vector;
@@ -538,6 +561,12 @@ where
         let a = Vector::new([1i32,-2,3]);
         let b = a.map(|x| x.abs());
         assert_eq!(b.0, [1,2,3]);
+    }
+
+    #[test] fn min_max() {
+        let a = Vector::new([1,2,3]);
+        assert_eq!(a.min(), 1);
+        assert_eq!(a.max(), 3);
     }
 
 
