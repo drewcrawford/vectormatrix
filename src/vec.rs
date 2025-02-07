@@ -4,7 +4,7 @@ use crate::types::{Constants, Float};
 /**
 A vector type.
 */
-#[derive(Copy,Clone)]
+#[derive(Debug,Copy,Clone,PartialEq)]
 pub struct Vector<T, const N: usize>([T; N]);
 
 impl <T, const N: usize> Vector<T, N> {
@@ -434,6 +434,12 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
     }
 }
 
+
+impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
+    ///A vector of [MaybeUninit::uninit] values.
+    pub const UNINIT: Self = Self([const { MaybeUninit::uninit() }; N]);
+}
+
 //map
 impl <T, const N: usize>  Vector<T, N>
 where
@@ -444,7 +450,7 @@ where
     where
         F: FnMut(T) -> U
     {
-        let mut result = Vector::new([const { MaybeUninit::uninit() }; N]);
+        let mut result = Vector::UNINIT;
 
         for i in 0..N {
             result.0[i] = MaybeUninit::new(f(self.0[i].clone()));
@@ -529,6 +535,22 @@ impl <T: Float + Constants + Clone + core::ops::Sub<Output=T> + core::ops::Mul<O
     }
 }
 
+//index
+impl <T, const N: usize>  core::ops::Index<usize> for Vector<T, N>
+{
+    type Output = T;
+    #[inline] fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
+//index_mut
+impl <T, const N: usize>  core::ops::IndexMut<usize> for Vector<T, N>
+{
+    #[inline] fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
+    }
+}
 
 #[cfg(test)] mod tests {
     use crate::vec::Vector;
