@@ -1,3 +1,5 @@
+use crate::types::Constants;
+
 /**
 A vector type.
 */
@@ -9,6 +11,22 @@ impl <T, const N: usize> Vec<T, N> {
 */
     pub const fn new(value: [T; N]) -> Self {
         Self(value)
+    }
+}
+
+impl<T: Constants, const N: usize> Vec<T, N> {
+    /**
+    Creates a new vector with all components set to zero.
+*/
+    #[inline] pub const fn zero() -> Self {
+        Self([T::ZERO; N])
+    }
+
+    /**
+    Creates a new vector with all components set to one.
+*/
+    #[inline] pub const fn one() -> Self {
+        Self([T::ONE; N])
     }
 }
 

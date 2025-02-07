@@ -1,0 +1,68 @@
+/*!
+* f32
+* f64
+* u8
+* u16
+* u32
+* u64
+* i8
+* i16
+* i32
+* i64
+*/
+pub trait Constants {
+    const ZERO: Self;
+    const ONE: Self;
+}
+
+impl Constants for f32 {
+    const ZERO: Self = 0.0;
+    const ONE: Self = 1.0;
+}
+
+impl Constants for f64 {
+    const ZERO: Self = 0.0;
+    const ONE: Self = 1.0;
+}
+
+impl Constants for u8 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for u16 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for u32 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for u64 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for i8 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for i16 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for i32 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+impl Constants for i64 {
+    const ZERO: Self = 0;
+    const ONE: Self = 1;
+}
+
+
