@@ -423,6 +423,17 @@ impl<T, const N: usize> Vector<MaybeUninit<T>,N> where T: Sized {
     }
 }
 
+//cross-product
+impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T>>  Vector<T, 3>
+{
+    #[inline] pub fn cross(self, other: Self) -> Self {
+        let x = self.y().clone() * other.z().clone() - self.z().clone() * other.y().clone();
+        let y = self.z().clone() * other.x().clone() - self.x().clone() * other.z().clone();
+        let z = self.x().clone() * other.y().clone() - self.y().clone() * other.x().clone();
+        Vector::new([x,y,z])
+    }
+}
+
 //map
 impl <T, const N: usize>  Vector<T, N>
 where
@@ -587,6 +598,12 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
         assert!(a.eq_approx(b, 0.01));
         assert!(!a.eq_approx(b, 0.001));
 
+    }
+    #[test] fn test_cross() {
+        let a = Vector::new([1,2,3]);
+        let b = Vector::new([4,5,6]);
+        let c = a.cross(b);
+        assert_eq!(c.0, [-3,6,-3]);
     }
 
 
