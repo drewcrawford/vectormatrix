@@ -65,4 +65,13 @@ impl Constants for i64 {
     const ONE: Self = 1;
 }
 
+pub trait Float {
+    fn sqrt(self) -> Self;
+}
 
+impl Float for f32 {
+    #[inline] fn sqrt(self) -> Self { self.sqrt() }
+}
+impl Float for f64 {
+    #[inline] fn sqrt(self) -> Self { self.sqrt() }
+}

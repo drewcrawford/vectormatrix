@@ -1,4 +1,4 @@
-use crate::types::Constants;
+use crate::types::{Constants, Float};
 
 /**
 A vector type.
@@ -196,7 +196,7 @@ impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  core::ops::Div for Ve
 }
 
 impl<T: core::ops::AddAssign + Clone, const N: usize>  Vec<T, N> {
-    #[inline] fn add_elementwise_assign(&mut self, other: Self) {
+    #[inline] pub fn add_elementwise_assign(&mut self, other: Self) {
         for i in 0..N {
             self.0[i] += other.0[i].clone();
         }
@@ -210,7 +210,7 @@ impl<T: core::ops::AddAssign + Clone, const N: usize>  core::ops::AddAssign for 
 }
 
 impl<T: core::ops::SubAssign + Clone, const N: usize>  Vec<T, N> {
-    #[inline] fn sub_elementwise_assign(&mut self, other: Self) {
+    #[inline] pub fn sub_elementwise_assign(&mut self, other: Self) {
         for i in 0..N {
             self.0[i] -= other.0[i].clone();
         }
@@ -251,7 +251,161 @@ impl<T: core::ops::DivAssign + Clone, const N: usize>  core::ops::DivAssign for 
     }
 }
 
+//scalar ops
+impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn add_scalar(self, other: T) -> Self {
+        let mut result = self.0.clone();
+        for i in 0..N {
+            result[i] = result[i].clone() + other.clone();
+        }
+        Self(result)
+    }
+}
 
+impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  core::ops::Add<T> for Vec<T, N> {
+    type Output = Self;
+    #[inline] fn add(self, other: T) -> Self {
+        self.add_scalar(other)
+    }
+}
+
+impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn sub_scalar(self, other: T) -> Self {
+        let mut result = self.0.clone();
+        for i in 0..N {
+            result[i] = result[i].clone() - other.clone();
+        }
+        Self(result)
+    }
+}
+
+impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  core::ops::Sub<T> for Vec<T, N> {
+    type Output = Self;
+    #[inline] fn sub(self, other: T) -> Self {
+        self.sub_scalar(other)
+    }
+}
+
+impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn mul_scalar(self, other: T) -> Self {
+        let mut result = self.0.clone();
+        for i in 0..N {
+            result[i] = result[i].clone() * other.clone();
+        }
+        Self(result)
+    }
+}
+
+impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  core::ops::Mul<T> for Vec<T, N> {
+    type Output = Self;
+    #[inline] fn mul(self, other: T) -> Self {
+        self.mul_scalar(other)
+    }
+}
+
+impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  Vec<T, N> {
+    #[inline] fn div_scalar(self, other: T) -> Self {
+        let mut result = self.0.clone();
+        for i in 0..N {
+            result[i] = result[i].clone() / other.clone();
+        }
+        Self(result)
+    }
+}
+
+impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  core::ops::Div<T> for Vec<T, N> {
+    type Output = Self;
+    #[inline] fn div(self, other: T) -> Self {
+        self.div_scalar(other)
+    }
+}
+
+impl<T: core::ops::AddAssign + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn add_assign_scalar(&mut self, other: T) {
+        for i in 0..N {
+            self.0[i] += other.clone();
+        }
+    }
+}
+
+impl<T: core::ops::AddAssign + Clone, const N: usize> core::ops::AddAssign<T> for Vec<T, N> {
+    #[inline] fn add_assign(&mut self, other: T) {
+        self.add_assign_scalar(other)
+    }
+}
+
+impl<T: core::ops::SubAssign + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn sub_assign_scalar(&mut self, other: T) {
+        for i in 0..N {
+            self.0[i] -= other.clone();
+        }
+    }
+}
+
+impl<T: core::ops::SubAssign + Clone, const N: usize> core::ops::SubAssign<T> for Vec<T, N> {
+    #[inline] fn sub_assign(&mut self, other: T) {
+        self.sub_assign_scalar(other)
+    }
+}
+
+impl <T: core::ops::MulAssign + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn mul_assign_scalar(&mut self, other: T) {
+        for i in 0..N {
+            self.0[i] *= other.clone();
+        }
+    }
+}
+
+impl<T: core::ops::MulAssign + Clone, const N: usize> core::ops::MulAssign<T> for Vec<T, N> {
+    #[inline] fn mul_assign(&mut self, other: T) {
+        self.mul_assign_scalar(other)
+    }
+}
+
+impl <T: core::ops::DivAssign + Clone, const N: usize>  Vec<T, N> {
+    #[inline] pub fn div_assign_scalar(&mut self, other: T) {
+        for i in 0..N {
+            self.0[i] /= other.clone();
+        }
+    }
+}
+
+impl<T: core::ops::DivAssign + Clone, const N: usize> core::ops::DivAssign<T> for Vec<T, N> {
+    #[inline] fn div_assign(&mut self, other: T) {
+        self.div_assign_scalar(other)
+    }
+}
+
+//length squared
+impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, const N: usize>  Vec<T, N> {
+    #[inline] pub fn length_squared(self) -> T {
+        let mut result = self.0[0].clone() * self.0[0].clone();
+        for i in 1..N {
+            result = result + self.0[i].clone() * self.0[i].clone();
+        }
+        result
+    }
+}
+
+impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T> + Float, const N: usize> Vec<T,N> {
+    #[inline] pub fn length(self) -> T {
+        self.length_squared().sqrt()
+    }
+}
+
+//euclid_distance_to
+
+impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vec<T, N> {
+    #[inline] pub fn euclid_distance_to(self, other: Self) -> T {
+        let mut result = self.0[0].clone() - other.0[0].clone();
+        result = result * result;
+        for i in 1..N {
+            let diff = self.0[i].clone() - other.0[i].clone();
+            result = result + diff * diff;
+        }
+        result.sqrt()
+    }
+}
 
 
 #[cfg(test)] mod tests {
@@ -294,4 +448,50 @@ impl<T: core::ops::DivAssign + Clone, const N: usize>  core::ops::DivAssign for 
         g /= h;
         assert_eq!(g.0, [0,0,0]);
     }
+
+    #[test] fn scalar() {
+        let a = Vec::new([1,2,3]);
+        let b = a + 1;
+        assert_eq!(b.0, [2,3,4]);
+
+        let c = a - 1;
+        assert_eq!(c.0, [0,1,2]);
+
+        let d = a * 2;
+        assert_eq!(d.0, [2,4,6]);
+
+        let e = a / 2;
+        assert_eq!(e.0, [0,1,1]);
+    }
+
+    #[test] fn scalar_assign() {
+        let mut a = Vec::new([1,2,3]);
+        a += 1;
+        assert_eq!(a.0, [2,3,4]);
+
+        let mut b = Vec::new([1,2,3]);
+        b -= 1;
+        assert_eq!(b.0, [0,1,2]);
+
+        let mut c = Vec::new([1,2,3]);
+        c *= 2;
+        assert_eq!(c.0, [2,4,6]);
+
+        let mut d = Vec::new([1,2,3]);
+        d /= 2;
+        assert_eq!(d.0, [0,1,1]);
+    }
+
+    #[test] fn length() {
+        let a = Vec::new([3.0,4.0]);
+        assert_eq!(a.length(), 5.0);
+    }
+
+    #[test] fn euclid_distance() {
+        let a = Vec::new([1.0,2.0]);
+        let b = Vec::new([4.0,6.0]);
+        assert_eq!(a.euclid_distance_to(b), 5.0);
+    }
+
+
 }
