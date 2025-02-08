@@ -81,7 +81,7 @@ impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>,R,C> {
 
 //elementwise add
 impl<T: Constants + Clone + core::ops::Add<Output=T> , const R: usize, const C: usize> Matrix<T,R,C> {
-    pub fn elementwise_add(self, other: Self) -> Self {
+    #[inline] pub fn elementwise_add(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_add(other.columns[c].clone()));
@@ -93,15 +93,15 @@ impl<T: Constants + Clone + core::ops::Add<Output=T> , const R: usize, const C: 
     }
 }
 
-impl<T: Constants + Clone + core::ops::Add<Output=T>, const R: usize, const c: usize> core::ops::Add for Matrix<T,R,c> {
+impl<T: Constants + Clone + core::ops::Add<Output=T>, const R: usize, const C: usize> core::ops::Add for Matrix<T,R,C> {
     type Output = Self;
-    fn add(self, other: Self) -> Self {
+    #[inline] fn add(self, other: Self) -> Self {
         self.elementwise_add(other)
     }
 }
 
 impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: usize> Matrix<T,R,C> {
-    pub fn elementwise_sub(self, other: Self) -> Self {
+    #[inline] pub fn elementwise_sub(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_sub(other.columns[c].clone()));
@@ -115,13 +115,13 @@ impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: 
 
 impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: usize> core::ops::Sub for  Matrix<T,R,C> {
     type Output = Self;
-    fn sub(self, other: Self) -> Self {
+    #[inline] fn sub(self, other: Self) -> Self {
         self.elementwise_sub(other)
     }
 }
 
 impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
-    pub fn elementwise_mul(self, other: Self) -> Self {
+    #[inline] pub fn elementwise_mul(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_mul(other.columns[c].clone()));
@@ -135,13 +135,13 @@ impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: u
 
 impl <T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> core::ops::Mul for Matrix<T,R,C> {
     type Output = Self;
-    fn mul(self, other: Self) -> Self {
+    #[inline] fn mul(self, other: Self) -> Self {
         self.elementwise_mul(other)
     }
 }
 
 impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
-    pub fn elementwise_div(self, other: Self) -> Self {
+    #[inline] pub fn elementwise_div(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_div(other.columns[c].clone()));
@@ -155,10 +155,11 @@ impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: 
 
 impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> core::ops::Div for Matrix<T,R,C> {
     type Output = Self;
-    fn div(self, other: Self) -> Self {
+    #[inline] fn div(self, other: Self) -> Self {
         self.elementwise_div(other)
     }
 }
+
 
 
 
@@ -272,64 +273,203 @@ impl<T: Constants> Matrix<T,4,4> {
 }
 
 //AddAssign, etc.
-impl <T: Constants + Clone + core::ops::AddAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    fn add_assign(&mut self, other: Self) {
+impl <T: Clone + core::ops::AddAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn add_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] += other.columns[c].clone();
         }
     }
 }
 
-impl <T: Constants + Clone + core::ops::AddAssign, const R: usize, const C: usize> core::ops::AddAssign for Matrix<T,R,C> {
-    fn add_assign(&mut self, other: Self) {
-        self.add_assign(other);
+impl <T: Clone + core::ops::AddAssign, const R: usize, const C: usize> core::ops::AddAssign for Matrix<T,R,C> {
+    #[inline] fn add_assign(&mut self, other: Self) {
+        self.add_elementwise_assign(other);
     }
 }
 
 //SubAssign
-impl <T: Constants + Clone + core::ops::SubAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    fn sub_assign(&mut self, other: Self) {
+impl <T: Clone + core::ops::SubAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn sub_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] -= other.columns[c].clone();
         }
     }
 }
-impl <T: Constants + Clone + core::ops::SubAssign, const R: usize, const C: usize> core::ops::SubAssign for Matrix<T,R,C> {
-    fn sub_assign(&mut self, other: Self) {
-        self.sub_assign(other);
+impl <T: Clone + core::ops::SubAssign, const R: usize, const C: usize> core::ops::SubAssign for Matrix<T,R,C> {
+    #[inline] fn sub_assign(&mut self, other: Self) {
+        self.sub_elementwise_assign(other);
     }
 }
 
 //MulAssign
-impl <T: Constants + Clone + core::ops::MulAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    fn mul_assign(&mut self, other: Self) {
+impl <T: Clone + core::ops::MulAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn mul_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] *= other.columns[c].clone();
         }
     }
 }
 
-impl <T: Constants + Clone + core::ops::MulAssign, const R: usize, const C: usize> core::ops::MulAssign for Matrix<T,R,C> {
-    fn mul_assign(&mut self, other: Self) {
-        self.mul_assign(other);
+impl <T: Clone + core::ops::MulAssign, const R: usize, const C: usize> core::ops::MulAssign for Matrix<T,R,C> {
+    #[inline] fn mul_assign(&mut self, other: Self) {
+        self.mul_elementwise_assign(other);
     }
 }
 
 //DivAssign
 
-impl <T: Constants + Clone + core::ops::DivAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    fn div_assign(&mut self, other: Self) {
+impl <T: Clone + core::ops::DivAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn div_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] /= other.columns[c].clone();
         }
     }
 }
 
-impl <T: Constants + Clone + core::ops::DivAssign, const R: usize, const C: usize> core::ops::DivAssign for Matrix<T,R,C> {
-    fn div_assign(&mut self, other: Self) {
-        self.div_assign(other);
+impl <T: Clone + core::ops::DivAssign, const R: usize, const C: usize> core::ops::DivAssign for Matrix<T,R,C> {
+    #[inline] fn div_assign(&mut self, other: Self) {
+        self.div_elementwise_assign(other);
     }
 }
+
+//scalar ops
+
+impl<T: Clone + core::ops::Add<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn add_scalar(self, other: T) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().add_scalar(other.clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl<T: Clone + core::ops::Sub<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn sub_scalar(self, other: T) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().sub_scalar(other.clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl<T: Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn mul_scalar(self, other: T) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().mul_scalar(other.clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl<T: Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    #[inline] pub fn div_scalar(self, other: T) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().div_scalar(other.clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+//trait implementations
+impl <T, const R: usize, const C: usize> core::ops::Add<T> for Matrix<T,R,C>
+where
+    T: core::ops::Add<Output=T> + Clone,
+{
+    type Output = Self;
+    #[inline] fn add(self, other: T) -> Self {
+        self.add_scalar(other)
+    }
+}
+
+impl <T, const R: usize, const C: usize> core::ops::Sub<T> for Matrix<T,R,C>
+where
+    T: core::ops::Sub<Output=T> + Clone,
+{
+    type Output = Self;
+    #[inline] fn sub(self, other: T) -> Self {
+        self.sub_scalar(other)
+    }
+}
+
+impl <T, const R: usize, const C: usize> core::ops::Mul<T> for Matrix<T,R,C>
+where
+    T: core::ops::Mul<Output=T> + Clone,
+{
+    type Output = Self;
+    #[inline] fn mul(self, other: T) -> Self {
+        self.mul_scalar(other)
+    }
+}
+
+impl <T, const R: usize, const C: usize> core::ops::Div<T> for Matrix<T,R,C>
+where
+    T: core::ops::Div<Output=T> + Clone,
+{
+    type Output = Self;
+    #[inline] fn div(self, other: T) -> Self {
+        self.div_scalar(other)
+    }
+}
+
+//addassign, scalar
+impl <T, const R: usize, const C: usize> Matrix<T,R,C>
+where
+    T: core::ops::AddAssign + Clone,
+{
+    #[inline] fn add_scalar_assign(&mut self, other: T) {
+        for c in 0..C {
+            self.columns[c] += other.clone();
+        }
+    }
+}
+
+impl <T, const R: usize, const C: usize> core::ops::AddAssign<T> for Matrix<T,R,C>
+where
+    T: core::ops::AddAssign + Clone,
+{
+    #[inline] fn add_assign(&mut self, other: T) {
+        self.add_scalar_assign(other);
+    }
+}
+
+//subassign, scalar
+
+impl <T, const R: usize, const C: usize> Matrix<T,R,C>
+where
+    T: core::ops::SubAssign + Clone,
+{
+    #[inline] pub fn sub_scalar_assign(&mut self, other: T) {
+        for c in 0..C {
+            self.columns[c] -= other.clone();
+        }
+    }
+}
+
+impl <T, const R: usize, const C: usize> core::ops::SubAssign<T> for Matrix<T,R,C>
+where
+    T: core::ops::SubAssign + Clone,
+{
+    fn sub_assign(&mut self, other: T) {
+        self.sub_scalar_assign(other);
+    }
+}
+
 
 
 

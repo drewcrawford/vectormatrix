@@ -298,7 +298,7 @@ impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  core::ops::Mul<T> for
 }
 
 impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  Vector<T, N> {
-    #[inline] fn div_scalar(self, other: T) -> Self {
+    #[inline] pub fn div_scalar(self, other: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() / other.clone();
