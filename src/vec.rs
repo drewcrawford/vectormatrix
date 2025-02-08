@@ -20,16 +20,9 @@ impl<T: Constants, const N: usize> Vector<T, N> {
     /**
     Creates a new vector with all components set to zero.
 */
-    #[inline] pub const fn zero() -> Self {
-        Self([T::ZERO; N])
-    }
+    pub const ZERO: Self = Self([T::ZERO; N]);
+    pub const ONE: Self = Self([T::ONE; N]);
 
-    /**
-    Creates a new vector with all components set to one.
-*/
-    #[inline] pub const fn one() -> Self {
-        Self([T::ONE; N])
-    }
 }
 
 //getters

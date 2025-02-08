@@ -1,19 +1,22 @@
-use alloc::vec::Vec;
 use core::mem::MaybeUninit;
+use crate::types::Constants;
 use crate::vec::Vector;
 
 pub struct Matrix<T, const R: usize, const C: usize> {
-    data: [Vector<T,R>; C],
+    columns: [Vector<T,R>; C],
 }
 
 impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     pub fn new_columns(columns: [Vector<T, R>; C]) -> Self {
         Self {
-            data: columns,
+            columns,
         }
     }
 
-    pub fn new_rows(rows: [Vector<T, C>; R]) -> Self where T: Clone {
+    pub fn new_rows(rows: [Vector<T, C>; R]) -> Self
+    where
+        T: Clone
+    {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             let mut column = Vector::UNINIT;
@@ -23,13 +26,44 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
             let column = unsafe { column.assume_init() };
             columns[c] = MaybeUninit::new(column);
         }
-        let arr: [Vector<T,R>; C] = columns.map(|maybe| unsafe { maybe.assume_init() });
+        let arr: [Vector<T, R>; C] = columns.map(|maybe| unsafe { maybe.assume_init() });
         Self {
-            data: arr,
+            columns: arr,
         }
+    }
 
+    pub fn new_from_array<const L: usize>(arr: [T; L]) -> Self
+    where T: Clone
+    {
+        assert_eq!(L,R * C);
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            let mut column = Vector::UNINIT;
+            for r in 0..R {
+                column[r] = MaybeUninit::new(arr[r * C + c].clone());
+            }
+            let column = unsafe { column.assume_init() };
+            columns[c] = MaybeUninit::new(column);
+        }
+        let arr: [Vector<T, R>; C] = columns.map(|maybe| unsafe { maybe.assume_init() });
+        Self {
+            columns: arr,
+        }
     }
 }
+
+//constants
+impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
+    pub const ZERO: Self = Self {
+        columns: [Vector::ZERO; C],
+    };
+    pub const ONE: Self = Self {
+        columns: [Vector::ONE; C],
+    };
+
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -40,8 +74,20 @@ mod tests {
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
         ]);
-        assert_eq!(m.data[0], Vector::new([1.0, 4.0]));
-        assert_eq!(m.data[1], Vector::new([2.0, 5.0]));
-        assert_eq!(m.data[2], Vector::new([3.0, 6.0]));
+        assert_eq!(m.columns[0], Vector::new([1.0, 4.0]));
+        assert_eq!(m.columns[1], Vector::new([2.0, 5.0]));
+        assert_eq!(m.columns[2], Vector::new([3.0, 6.0]));
+    }
+
+    #[test] fn test_from_array() {
+        use crate::vec::Vector;
+        use crate::matrix::Matrix;
+        let m = Matrix::<f32, 2, 3>::new_from_array([
+            1.0, 2.0, 3.0,
+            4.0, 5.0, 6.0,
+        ]);
+        assert_eq!(m.columns[0], Vector::new([1.0, 4.0]));
+        assert_eq!(m.columns[1], Vector::new([2.0, 5.0]));
+        assert_eq!(m.columns[2], Vector::new([3.0, 6.0]));
     }
 }
