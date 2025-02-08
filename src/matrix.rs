@@ -3,11 +3,17 @@ use core::mem::MaybeUninit;
 use crate::types::Constants;
 use crate::vec::Vector;
 
+#[derive(Copy,Clone,PartialEq)]
 pub struct Matrix<T, const R: usize, const C: usize> {
     columns: [Vector<T,R>; C],
 }
 
 impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
+
+    pub const UNINIT: Matrix<MaybeUninit<T>,R,C> = Matrix {
+        columns: [Vector::UNINIT; C],
+    };
+
     pub fn new_columns(columns: [Vector<T, R>; C]) -> Self {
         Self {
             columns,
@@ -59,7 +65,104 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
             columns: arr,
         }
     }
+
+
 }
+
+//assume_init
+impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>,R,C> {
+    pub unsafe fn assume_init(self) -> Matrix<T,R,C> {
+        let columns = self.columns.map(|maybe| unsafe { maybe.assume_init() });
+        Matrix {
+            columns
+        }
+    }
+}
+
+//elementwise add
+impl<T: Constants + Clone + core::ops::Add<Output=T> , const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn elementwise_add(self, other: Self) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_add(other.columns[c].clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl<T: Constants + Clone + core::ops::Add<Output=T>, const R: usize, const c: usize> core::ops::Add for Matrix<T,R,c> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        self.elementwise_add(other)
+    }
+}
+
+impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn elementwise_sub(self, other: Self) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_sub(other.columns[c].clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: usize> core::ops::Sub for  Matrix<T,R,C> {
+    type Output = Self;
+    fn sub(self, other: Self) -> Self {
+        self.elementwise_sub(other)
+    }
+}
+
+impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn elementwise_mul(self, other: Self) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_mul(other.columns[c].clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl <T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> core::ops::Mul for Matrix<T,R,C> {
+    type Output = Self;
+    fn mul(self, other: Self) -> Self {
+        self.elementwise_mul(other)
+    }
+}
+
+impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn elementwise_div(self, other: Self) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_div(other.columns[c].clone()));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
+
+impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> core::ops::Div for Matrix<T,R,C> {
+    type Output = Self;
+    fn div(self, other: Self) -> Self {
+        self.elementwise_div(other)
+    }
+}
+
+
+
+
 
 //constants
 impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
@@ -168,6 +271,68 @@ impl<T: Constants> Matrix<T,4,4> {
     };
 }
 
+//AddAssign, etc.
+impl <T: Constants + Clone + core::ops::AddAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    fn add_assign(&mut self, other: Self) {
+        for c in 0..C {
+            self.columns[c] += other.columns[c].clone();
+        }
+    }
+}
+
+impl <T: Constants + Clone + core::ops::AddAssign, const R: usize, const C: usize> core::ops::AddAssign for Matrix<T,R,C> {
+    fn add_assign(&mut self, other: Self) {
+        self.add_assign(other);
+    }
+}
+
+//SubAssign
+impl <T: Constants + Clone + core::ops::SubAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    fn sub_assign(&mut self, other: Self) {
+        for c in 0..C {
+            self.columns[c] -= other.columns[c].clone();
+        }
+    }
+}
+impl <T: Constants + Clone + core::ops::SubAssign, const R: usize, const C: usize> core::ops::SubAssign for Matrix<T,R,C> {
+    fn sub_assign(&mut self, other: Self) {
+        self.sub_assign(other);
+    }
+}
+
+//MulAssign
+impl <T: Constants + Clone + core::ops::MulAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    fn mul_assign(&mut self, other: Self) {
+        for c in 0..C {
+            self.columns[c] *= other.columns[c].clone();
+        }
+    }
+}
+
+impl <T: Constants + Clone + core::ops::MulAssign, const R: usize, const C: usize> core::ops::MulAssign for Matrix<T,R,C> {
+    fn mul_assign(&mut self, other: Self) {
+        self.mul_assign(other);
+    }
+}
+
+//DivAssign
+
+impl <T: Constants + Clone + core::ops::DivAssign, const R: usize, const C: usize> Matrix<T,R,C> {
+    fn div_assign(&mut self, other: Self) {
+        for c in 0..C {
+            self.columns[c] /= other.columns[c].clone();
+        }
+    }
+}
+
+impl <T: Constants + Clone + core::ops::DivAssign, const R: usize, const C: usize> core::ops::DivAssign for Matrix<T,R,C> {
+    fn div_assign(&mut self, other: Self) {
+        self.div_assign(other);
+    }
+}
+
+
+
 
 
 impl <T, const R: usize, const C: usize> Debug for Matrix<T,R,C>
@@ -226,5 +391,33 @@ mod tests {
         use alloc::format;
         println!("{:?}", m);
         assert_eq!(format!("{:?}", m), "   1.000   2.000   3.000\n   4.000   5.000   6.000\n");
+    }
+
+    #[test] fn test_elementwise() {
+        use crate::vec::Vector;
+        use crate::matrix::Matrix;
+        let m1 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([1.0, 2.0, 3.0]),
+            Vector::new([4.0, 5.0, 6.0]),
+        ]);
+        let m2 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([7.0, 8.0, 9.0]),
+            Vector::new([10.0, 11.0, 12.0]),
+        ]);
+        let m3 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([8.0, 10.0, 12.0]),
+            Vector::new([14.0, 16.0, 18.0]),
+        ]);
+        assert_eq!(m1 + m2, m3);
+        assert_eq!(m3 - m2, m1);
+        assert_eq!(m1 * m2, Matrix::new_rows([
+            Vector::new([7.0, 16.0, 27.0]),
+            Vector::new([40.0, 55.0, 72.0]),
+        ]));
+
+        assert_eq!(m3 / m2, Matrix::new_rows([
+            Vector::new([8.0/7.0, 10.0/8.0, 12.0/9.0]),
+            Vector::new([14.0/10.0, 16.0/11.0, 18.0/12.0]),
+        ]));
     }
 }
