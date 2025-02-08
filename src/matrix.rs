@@ -1,3 +1,4 @@
+use core::fmt::Debug;
 use core::mem::MaybeUninit;
 use crate::types::Constants;
 use crate::vec::Vector;
@@ -63,6 +64,25 @@ impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
 
 }
 
+impl <T, const R: usize, const C: usize> Debug for Matrix<T,R,C>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        //pretty-print the matrix
+        for row in 0..R {
+            for col in 0..C {
+                // Right-align in a width of 8 for demonstration:
+                write!(f, "{:>8.3?}", self.columns[col][row])?;
+            }
+            // End the row
+            writeln!(f)?;
+        }
+
+        Ok(())
+    }
+}
+
 
 
 #[cfg(test)]
@@ -89,5 +109,16 @@ mod tests {
         assert_eq!(m.columns[0], Vector::new([1.0, 4.0]));
         assert_eq!(m.columns[1], Vector::new([2.0, 5.0]));
         assert_eq!(m.columns[2], Vector::new([3.0, 6.0]));
+    }
+    #[test] fn test_debug() {
+        use crate::vec::Vector;
+        use crate::matrix::Matrix;
+        let m = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([1.0, 2.0, 3.0]),
+            Vector::new([4.0, 5.0, 6.0]),
+        ]);
+        use alloc::format;
+        println!("{:?}", m);
+        assert_eq!(format!("{:?}", m), "   1.000   2.000   3.000\n   4.000   5.000   6.000\n");
     }
 }
