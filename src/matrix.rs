@@ -18,25 +18,14 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     where
         T: Clone
     {
-        let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            let mut column = Vector::UNINIT;
-            for r in 0..R {
-                column[r] = MaybeUninit::new(rows[r][c].clone());
-            }
-            let column = unsafe { column.assume_init() };
-            columns[c] = MaybeUninit::new(column);
-        }
-        let arr: [Vector<T, R>; C] = columns.map(|maybe| unsafe { maybe.assume_init() });
-        Self {
-            columns: arr,
-        }
+        Matrix::new_columns(rows).transpose()
     }
 
     pub fn new_from_array<const L: usize>(arr: [T; L]) -> Self
-    where T: Clone
+    where
+        T: Clone
     {
-        assert_eq!(L,R * C);
+        assert_eq!(L, R * C);
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             let mut column = Vector::UNINIT;
@@ -48,6 +37,25 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
         }
         let arr: [Vector<T, R>; C] = columns.map(|maybe| unsafe { maybe.assume_init() });
         Self {
+            columns: arr,
+        }
+    }
+
+    pub fn transpose(self) -> Matrix<T, C, R>
+    where
+        T: Clone
+    {
+        let mut columns = [const { MaybeUninit::uninit() }; R];
+        for r in 0..R {
+            let mut column = Vector::UNINIT;
+            for c in 0..C {
+                column[c] = MaybeUninit::new(self.columns[c][r].clone());
+            }
+            let column = unsafe { column.assume_init() };
+            columns[r] = MaybeUninit::new(column);
+        }
+        let arr: [Vector<T, C>; R] = columns.map(|maybe| unsafe { maybe.assume_init() });
+        Matrix {
             columns: arr,
         }
     }
