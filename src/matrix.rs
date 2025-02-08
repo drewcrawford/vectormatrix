@@ -61,8 +61,106 @@ impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
     pub const ONE: Self = Self {
         columns: [Vector::ONE; C],
     };
-
 }
+
+//identities
+impl <T: Constants> Matrix<T,1,1> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::ONE],
+    };
+}
+
+impl <T: Constants> Matrix<T,1,2> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::ONE, Vector::ZERO],
+    };
+}
+
+impl<T: Constants> Matrix<T,1,3> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::ONE, Vector::ZERO, Vector::ZERO],
+    };
+}
+
+impl <T: Constants> Matrix<T,1,4> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::ONE, Vector::ZERO, Vector::ZERO, Vector::ZERO],
+    };
+}
+
+impl<T: Constants> Matrix<T,2,1> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO])],
+    };
+}
+
+impl<T: Constants> Matrix<T,2,2> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ONE])],
+    };
+}
+
+impl<T: Constants> Matrix<T,2,3> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ONE]), Vector::new([T::ZERO, T::ZERO])],
+    };
+}
+
+impl<T: Constants> Matrix<T,2,4> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ONE]), Vector::new([T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ZERO])],
+    };
+}
+
+impl <T: Constants> Matrix<T,3,1> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO])],
+    };
+}
+
+impl <T: Constants> Matrix<T,3,2> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO])],
+    };
+}
+
+impl <T: Constants> Matrix<T,3,3> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE])],
+    };
+}
+
+impl <T: Constants> Matrix<T,3,4> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE]), Vector::new([T::ZERO, T::ZERO, T::ZERO])],
+    };
+}
+
+impl<T: Constants> Matrix<T,4,1> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO])],
+    };
+}
+
+impl<T: Constants> Matrix<T,4,2> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO])],
+    };
+}
+
+impl<T: Constants> Matrix<T,4,3> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE, T::ZERO])],
+    };
+}
+
+impl<T: Constants> Matrix<T,4,4> {
+    pub const IDENTITY: Self = Self {
+        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ZERO, T::ONE])],
+    };
+}
+
+
 
 impl <T, const R: usize, const C: usize> Debug for Matrix<T,R,C>
 where
