@@ -437,7 +437,6 @@ impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
 impl <T, const N: usize>  Vector<T, N>
 where
     T: Clone,
-    [T; N]: private::AtLeastOne
 {
     #[inline] pub fn map<F,U>(self, mut f: F) -> Vector<U, N>
     where
@@ -451,6 +450,21 @@ where
         unsafe { result.assume_init() }
     }
 }
+
+//map_in_place
+impl <T, const N: usize>  Vector<T, N>
+{
+    #[inline] pub fn map_in_place<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&mut T)
+    {
+        for i in 0..N {
+            f(&mut self.0[i]);
+        }
+    }
+}
+
+
 
 //eq_approx
 impl <T: Float + Clone, const N: usize>  Vector<T, N> {

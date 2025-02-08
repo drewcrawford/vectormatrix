@@ -470,10 +470,42 @@ where
     }
 }
 
+//map
+impl<T: Clone, const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn map<F: FnMut(T) -> T>(self, mut f: F) -> Self {
+        let mut columns = [const { MaybeUninit::uninit() }; C];
+        for c in 0..C {
+            columns[c] = MaybeUninit::new(self.columns[c].clone().map(|v| f(v)));
+        }
+        let c = unsafe { columns.map(|c| c.assume_init()) };
+        Self {
+            columns: c
+        }
+    }
+}
 
+//map_in_place
+impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn map_in_place<F: FnMut(&mut T)>(&mut self, mut f: F) {
+        for c in 0..C {
+            self.columns[c].map_in_place(|v| f(v));
+        }
+    }
+}
 
-
-
+//eq_approx
+impl<T, const R: usize, const C: usize> Matrix<T,R,C>
+where T: Clone + crate::types::Float
+{
+    pub fn eq_approx(self, other: Self, tolerance: T) -> bool {
+        for c in 0..C {
+            if !self.columns[c].clone().eq_approx(other.columns[c].clone(), tolerance.clone()) {
+                return false;
+            }
+        }
+        true
+    }
+}
 
 impl <T, const R: usize, const C: usize> Debug for Matrix<T,R,C>
 where
@@ -559,5 +591,19 @@ mod tests {
             Vector::new([8.0/7.0, 10.0/8.0, 12.0/9.0]),
             Vector::new([14.0/10.0, 16.0/11.0, 18.0/12.0]),
         ]));
+    }
+
+    #[test] fn map() {
+        use crate::vec::Vector;
+        use crate::matrix::Matrix;
+        let m1 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([1.0, 2.0, 3.0]),
+            Vector::new([4.0, 5.0, 6.0]),
+        ]);
+        let m2 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([2.0, 4.0, 6.0]),
+            Vector::new([8.0, 10.0, 12.0]),
+        ]);
+        assert_eq!(m1.map(|v| v * 2.0), m2);
     }
 }
