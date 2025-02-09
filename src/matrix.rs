@@ -507,6 +507,32 @@ where T: Clone + crate::types::Float
     }
 }
 
+//columns accessors
+impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
+    /**
+    Access the columns of the underlying matrix.
+
+    Since the matrix storage is column-major, we return an inner slice of the columns.
+    */
+    #[inline] pub fn columns(&self) -> &[Vector<T,R>; C] {
+        &self.columns
+    }
+}
+
+//row accessor
+impl<T, const R: usize, const C: usize> Matrix<T,R,C>
+where T: Clone {
+    /**
+    Access the rows of the underlying matrix.
+
+    Since the matrix storage is column-major, we return the transpose of the columns.
+    */
+    #[inline] pub fn rows(self) -> [Vector<T, C>; R] {
+        self.transpose().columns
+    }
+}
+
+
 impl <T, const R: usize, const C: usize> Debug for Matrix<T,R,C>
 where
     T: Debug,
@@ -605,5 +631,16 @@ mod tests {
             Vector::new([8.0, 10.0, 12.0]),
         ]);
         assert_eq!(m1.map(|v| v * 2.0), m2);
+    }
+
+    #[test] fn rows_cols() {
+        use crate::vec::Vector;
+        use crate::matrix::Matrix;
+        let m1 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([1.0, 2.0, 3.0]),
+            Vector::new([4.0, 5.0, 6.0]),
+        ]);
+        assert_eq!(m1.columns(), &[Vector::new([1.0, 4.0]), Vector::new([2.0, 5.0]), Vector::new([3.0, 6.0])]);
+        assert_eq!(m1.rows(), [Vector::new([1.0, 2.0, 3.0]), Vector::new([4.0, 5.0, 6.0])]);
     }
 }
