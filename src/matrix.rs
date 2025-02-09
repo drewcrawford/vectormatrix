@@ -121,6 +121,9 @@ impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: 
 }
 
 impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+    ///Multiply all elements in the matrix by the corresponding elements in the other matrix.
+    ///
+    /// This has no Mul implementation -> in Rust that would conflict with matrix multiply.
     #[inline] pub fn elementwise_mul(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
@@ -133,12 +136,6 @@ impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: u
     }
 }
 
-impl <T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> core::ops::Mul for Matrix<T,R,C> {
-    type Output = Self;
-    #[inline] fn mul(self, other: Self) -> Self {
-        self.elementwise_mul(other)
-    }
-}
 
 impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
     #[inline] pub fn elementwise_div(self, other: Self) -> Self {
@@ -517,6 +514,24 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     #[inline] pub fn columns(&self) -> &[Vector<T,R>; C] {
         &self.columns
     }
+
+    #[inline] pub fn columns_mut(&mut self) -> &mut [Vector<T,R>; C] {
+        &mut self.columns
+    }
+
+    /**
+    Returns a reference to the element at the given row and column.
+    */
+    #[inline] pub fn element_at(&self, row: usize, col: usize) -> &T {
+        &self.columns[col][row]
+    }
+
+    /**
+    Returns a mutable reference to the element at the given row and column.
+    */
+    #[inline] pub fn element_at_mut(&mut self, row: usize, col: usize) -> &mut T {
+        &mut self.columns[col][row]
+    }
 }
 
 //row accessor
@@ -552,7 +567,37 @@ where
     }
 }
 
+//matrix multiplication
 
+impl <T, const M: usize, const N: usize> Matrix<T,M,N>
+where T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
+{
+    #[inline]
+    pub fn mul_matrix<const P: usize>(self, other: Matrix<T, N, P>) -> Matrix<T, M, P> {
+        let mut out = Matrix::UNINIT;
+        let a_rows = self.transpose();
+        for c in 0..P { //columns of output
+            let b_column = other.columns[c].clone();
+            for r in 0..M {
+                out.columns[c][r] = MaybeUninit::new(a_rows.columns[r].clone().dot(b_column.clone()));
+            }
+        }
+
+        unsafe{out.assume_init()}
+
+    }
+}
+
+impl<T, const M: usize, const N: usize,const P: usize> core::ops::Mul<Matrix<T, N, P>> for Matrix<T, M, N>
+where
+    T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
+{
+    type Output = Matrix<T, M, P>;
+    #[inline]
+    fn mul(self, other: Matrix<T, N, P>) -> Self::Output {
+        self.mul_matrix(other)
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -608,7 +653,7 @@ mod tests {
         ]);
         assert_eq!(m1 + m2, m3);
         assert_eq!(m3 - m2, m1);
-        assert_eq!(m1 * m2, Matrix::new_rows([
+        assert_eq!(m1.elementwise_mul(m2), Matrix::new_rows([
             Vector::new([7.0, 16.0, 27.0]),
             Vector::new([40.0, 55.0, 72.0]),
         ]));
@@ -642,5 +687,25 @@ mod tests {
         ]);
         assert_eq!(m1.columns(), &[Vector::new([1.0, 4.0]), Vector::new([2.0, 5.0]), Vector::new([3.0, 6.0])]);
         assert_eq!(m1.rows(), [Vector::new([1.0, 2.0, 3.0]), Vector::new([4.0, 5.0, 6.0])]);
+    }
+
+    #[test] fn test_mul() {
+        use crate::vec::Vector;
+        use crate::matrix::Matrix;
+        let m1 = Matrix::<f32, 2, 3>::new_rows([
+            Vector::new([1.0, 2.0, 3.0]),
+            Vector::new([4.0, 5.0, 6.0]),
+        ]);
+        let m2 = Matrix::<f32, 3, 2>::new_rows([
+            Vector::new([7.0, 8.0]),
+            Vector::new([9.0, 10.0]),
+            Vector::new([11.0, 12.0]),
+        ]);
+        let m3 = Matrix::<f32, 2, 2>::new_rows([
+            Vector::new([58.0, 64.0]),
+            Vector::new([139.0, 154.0]),
+        ]);
+        assert_eq!(m1.clone() * m2.clone(), m3);
+        assert_eq!(m1.clone().mul_matrix(m2), m3);
     }
 }

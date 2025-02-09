@@ -502,7 +502,7 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
 }
 
 //dot product
-impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
+impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
 {
     #[inline] pub fn dot(self, other: Self) -> T {
         let mut result = self.0[0].clone() * other.0[0].clone();
