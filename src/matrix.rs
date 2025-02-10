@@ -138,7 +138,13 @@ impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: u
 
 
 impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
-    #[inline] pub fn elementwise_div(self, other: Self) -> Self {
+    /**
+    Divide all elements in the matrix by the corresponding elements in the other matrix.
+
+    This has no Div implementation, there is not a neat mathematical definition of matrix division.
+    */
+    #[inline]
+    pub fn elementwise_div(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_div(other.columns[c].clone()));
@@ -149,17 +155,6 @@ impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: 
         }
     }
 }
-
-impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> core::ops::Div for Matrix<T,R,C> {
-    type Output = Self;
-    #[inline] fn div(self, other: Self) -> Self {
-        self.elementwise_div(other)
-    }
-}
-
-
-
-
 
 
 //constants
@@ -599,6 +594,20 @@ where
     }
 }
 
+impl<T, const R: usize, const C: usize> core::ops::Mul<Vector<T, C>> for Matrix<T, R, C>
+where
+    T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
+{
+    type Output = Matrix<T, R, 1>;
+    #[inline]
+    fn mul(self, other: Vector<T, C>) -> Self::Output {
+        self.mul_matrix(other.to_col())
+    }
+}
+
+
+
+
 #[cfg(test)]
 mod tests {
     #[test] fn test() {
@@ -658,7 +667,7 @@ mod tests {
             Vector::new([40.0, 55.0, 72.0]),
         ]));
 
-        assert_eq!(m3 / m2, Matrix::new_rows([
+        assert_eq!(m3.elementwise_div(m2), Matrix::new_rows([
             Vector::new([8.0/7.0, 10.0/8.0, 12.0/9.0]),
             Vector::new([14.0/10.0, 16.0/11.0, 18.0/12.0]),
         ]));

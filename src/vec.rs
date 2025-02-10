@@ -1,4 +1,5 @@
 use core::mem::MaybeUninit;
+use crate::matrix::Matrix;
 use crate::types::{Constants, Float};
 
 /**
@@ -558,6 +559,35 @@ impl <T, const N: usize>  core::ops::IndexMut<usize> for Vector<T, N>
         &mut self.0[index]
     }
 }
+
+//to_row, to_col
+impl <T, const N: usize>  Vector<T, N> where T: Clone
+{
+    #[inline] pub fn to_row(self) -> Matrix<T, 1, N> {
+        Matrix::new_rows([self])
+    }
+
+    #[inline] pub fn from_row(row: Matrix<T, 1, N>) -> Self {
+        row.rows()[0].clone()
+    }
+
+    #[inline] pub fn from_col(col: Matrix<T, N, 1>) -> Self {
+        col.columns()[0].clone()
+    }
+
+    #[inline] pub fn to_col(self) -> Matrix<T, N, 1> {
+        Matrix::new_columns([self])
+    }
+}
+
+impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vector<T,M> where T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T> {
+    type Output = Matrix<T,1,N>;
+
+    fn mul(self, rhs: Matrix<T, M,N>) -> Self::Output {
+        self.to_row().mul_matrix(rhs)
+    }
+}
+
 
 #[cfg(test)] mod tests {
     use crate::vec::Vector;
