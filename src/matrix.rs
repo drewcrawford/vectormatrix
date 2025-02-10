@@ -1,3 +1,5 @@
+mod m3x3;
+
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
 use crate::types::Constants;
@@ -14,7 +16,7 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
         columns: [Vector::UNINIT; C],
     };
 
-    pub fn new_columns(columns: [Vector<T, R>; C]) -> Self {
+    pub const fn new_columns(columns: [Vector<T, R>; C]) -> Self {
         Self {
             columns,
         }

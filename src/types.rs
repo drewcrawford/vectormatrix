@@ -68,6 +68,9 @@ impl Constants for i64 {
 pub trait Float {
     fn sqrt(self) -> Self;
     fn eq_approx(self, other: Self, tolerance: Self) -> bool;
+
+    fn sin(self) -> Self;
+    fn cos(self) -> Self;
 }
 
 impl Float for f32 {
@@ -75,10 +78,17 @@ impl Float for f32 {
     #[inline] fn eq_approx(self, other: Self, tolerance: Self) -> bool {
         (self - other).abs() < tolerance
     }
+
+    #[inline] fn sin(self) -> Self { self.sin() }
+    #[inline] fn cos(self) -> Self { self.cos() }
 }
 impl Float for f64 {
     #[inline] fn sqrt(self) -> Self { self.sqrt() }
     #[inline] fn eq_approx(self, other: Self, tolerance: Self) -> bool {
         (self - other).abs() < tolerance
     }
+
+    #[inline] fn sin(self) -> Self { self.sin() }
+    #[inline] fn cos(self) -> Self { self.cos() }
+
 }
