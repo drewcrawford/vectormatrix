@@ -503,6 +503,7 @@ impl <T: Float + Clone, const N: usize>  Vector<T, N> {
 
 //min, max
 impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
+    ///Gets the maximum value in the vector.
     #[inline] pub fn max(self) -> T {
         let mut result = self.0[0].clone();
         for i in 1..N {
@@ -513,6 +514,9 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
         result
     }
 
+    /**
+    Gets the minimum value in the vector.
+    */
     #[inline] pub fn min(self) -> T {
         let mut result = self.0[0].clone();
         for i in 1..N {
@@ -527,6 +531,9 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
 //dot product
 impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
 {
+    /**
+    Calculates the dot product of two vectors.
+    */
     #[inline] pub fn dot(self, other: Self) -> T {
         let mut result = self.0[0].clone() * other.0[0].clone();
         for i in 1..N {
@@ -539,6 +546,9 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: u
 //clamp
 impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
 {
+    /**
+    Clamps the elements of the vector between two values.
+*/
     #[inline] pub fn clamp(self, min: T, max: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
