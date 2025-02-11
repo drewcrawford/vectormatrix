@@ -139,4 +139,155 @@ impl<T> Matrix<T,4,4> {
         ])
     }
 
+    /**
+    Calculates the determinant of the matrix.
+    */
+    pub fn determinant(self) -> T where T: Clone + core::ops::Mul<Output=T> + core::ops::Sub<Output=T> + core::ops::Add<Output=T> + core::ops::Neg<Output=T> {
+        let m0 = self.columns()[0].x().clone();
+        let m1 = self.columns()[1].x().clone();
+        let m2 = self.columns()[2].x().clone();
+        let m3 = self.columns()[3].x().clone();
+        let m4 = self.columns()[0].y().clone();
+        let m5 = self.columns()[1].y().clone();
+        let m6 = self.columns()[2].y().clone();
+        let m7 = self.columns()[3].y().clone();
+        let m8 = self.columns()[0].z().clone();
+        let m9 = self.columns()[1].z().clone();
+        let m10 = self.columns()[2].z().clone();
+        let m11 = self.columns()[3].z().clone();
+        let m12 = self.columns()[0].w().clone();
+        let m13 = self.columns()[1].w().clone();
+        let m14 = self.columns()[2].w().clone();
+        let m15 = self.columns()[3].w().clone();
+
+        //these inv values represent the adjugate matrix (ie, cofactor matrix transposed).
+        let inv0 = m5.clone()  * m10.clone() * m15.clone() -
+            m5.clone()  * m11.clone() * m14.clone() -
+            m9.clone()  * m6.clone() * m15.clone() +
+            m9.clone()  * m7.clone()  * m14.clone() +
+            m13.clone() * m6.clone()  * m11.clone() -
+            m13.clone() * m7.clone()  * m10.clone();
+        let inv4 = -m4.clone()  * m10.clone()  * m15.clone() +
+            m4.clone()  * m11.clone() * m14.clone() +
+            m8.clone()  * m6.clone()  * m15.clone() -
+            m8.clone()  * m7.clone()  * m14.clone() -
+            m12.clone() * m6.clone()  * m11.clone() +
+            m12.clone() * m7.clone() * m10.clone();
+
+        let inv8 = m4.clone()  * m9.clone() * m15.clone() -
+            m4.clone()  * m11.clone() * m13.clone() -
+            m8.clone()  * m5.clone() * m15.clone() +
+            m8.clone()  * m7.clone() * m13.clone() +
+            m12.clone() * m5.clone() * m11.clone() -
+            m12.clone() * m7.clone() * m9.clone();
+
+        let inv12 = -m4.clone()  * m9.clone() * m14.clone() +
+            m4.clone()  * m10.clone() * m13.clone() +
+            m8.clone()  * m5.clone() * m14.clone() -
+            m8.clone()  * m6.clone() * m13.clone() -
+            m12.clone() * m5.clone() * m10.clone() +
+            m12.clone() * m6.clone() * m9.clone();
+
+        // let inv1 = -m1.clone()  * m10.clone() * m15.clone() +
+        //     m1.clone()  * m11.clone() * m14.clone() +
+        //     m9.clone()  * m2.clone() * m15.clone() -
+        //     m9.clone()  * m3.clone() * m14.clone() -
+        //     m13.clone() * m2.clone() * m11.clone() +
+        //     m13.clone() * m3.clone() * m10.clone();
+
+        // let inv5 = m0.clone()  * m10.clone() * m15.clone() -
+        //     m0.clone()  * m11.clone() * m14.clone() -
+        //     m8.clone()  * m2.clone() * m15.clone() +
+        //     m8.clone()  * m3.clone() * m14.clone() +
+        //     m12.clone() * m2.clone() * m11.clone() -
+        //     m12.clone() * m3.clone() * m10.clone();
+
+        // let inv9 = -m0.clone()  * m9.clone() * m15.clone() +
+        //     m0.clone()  * m11.clone() * m13.clone() +
+        //     m8.clone()  * m1.clone() * m15.clone() -
+        //     m8.clone()  * m3.clone() * m13.clone() -
+        //     m12.clone() * m1.clone() * m11.clone() +
+        //     m12.clone() * m3.clone() * m9.clone();
+
+        // let inv13 = m0.clone()  * m9.clone() * m14.clone() -
+        //     m0.clone()  * m10.clone() * m13.clone() -
+        //     m8.clone()  * m1.clone() * m14.clone() +
+        //     m8.clone()  * m2.clone() * m13.clone() +
+        //     m12.clone() * m1.clone() * m10.clone() -
+        //     m12.clone() * m2.clone() * m9.clone();
+
+        // let inv2 = m1.clone()  * m6.clone() * m15.clone() -
+        //     m1.clone()  * m7.clone() * m14.clone() -
+        //     m5.clone()  * m2.clone() * m15.clone() +
+        //     m5.clone()  * m3.clone() * m14.clone() +
+        //     m13.clone() * m2.clone() * m7.clone() -
+        //     m13.clone() * m3.clone() * m6.clone();
+        //
+        // let inv6 = -m0.clone()  * m6.clone() * m15.clone() +
+        //     m0.clone()  * m7.clone() * m14.clone() +
+        //     m4.clone()  * m2.clone() * m15.clone() -
+        //     m4.clone()  * m3.clone() * m14.clone() -
+        //     m12.clone() * m2.clone() * m7.clone() +
+        //     m12.clone() * m3.clone() * m6.clone();
+        //
+        // let inv10 = m0.clone()  * m5.clone() * m15.clone() -
+        //     m0.clone()  * m7.clone() * m13.clone() -
+        //     m4.clone()  * m1.clone() * m15.clone() +
+        //     m4.clone()  * m3.clone() * m13.clone() +
+        //     m12.clone() * m1.clone() * m7.clone() -
+        //     m12.clone() * m3.clone() * m5.clone();
+        //
+        // let inv14 = -m0.clone()  * m5.clone() * m14.clone() +
+        //     m0.clone()  * m6.clone() * m13.clone() +
+        //     m4.clone()  * m1.clone() * m14.clone() -
+        //     m4.clone()  * m2.clone() * m13.clone() -
+        //     m12.clone() * m1.clone() * m6.clone() +
+        //     m12.clone() * m2.clone() * m5.clone();
+        //
+        // let inv3 = -m1.clone() * m6.clone() * m11.clone() +
+        //     m1.clone() * m7.clone() * m10.clone() +
+        //     m5.clone() * m2.clone() * m11.clone() -
+        //     m5.clone() * m3.clone() * m10.clone() -
+        //     m9.clone() * m2.clone() * m7.clone() +
+        //     m9.clone() * m3.clone() * m6.clone();
+        //
+        // let inv7 = m0.clone() * m6.clone() * m11.clone() -
+        //     m0.clone() * m7.clone() * m10.clone() -
+        //     m4.clone() * m2.clone() * m11.clone()+
+        //     m4.clone() * m3.clone() * m10.clone() +
+        //     m8.clone() * m2.clone() * m7.clone() -
+        //     m8.clone() * m3.clone() * m6.clone();
+        //
+        // let inv11 = -m0.clone() * m5.clone() * m11.clone() +
+        //     m0.clone() * m7.clone() * m9.clone() +
+        //     m4.clone() * m1.clone() * m11 -
+        //     m4.clone() * m3.clone() * m9.clone() -
+        //     m8.clone() * m1.clone() * m7 +
+        //     m8.clone() * m3.clone() * m5.clone();
+        //
+        // let inv15 = m0.clone() * m5.clone() * m10.clone() -
+        //     m0.clone() * m6.clone() * m9.clone() -
+        //     m4.clone() * m1.clone() * m10 +
+        //     m4 * m2.clone() * m9 +
+        //     m8.clone() * m1.clone() * m6 -
+        //     m8 * m2.clone() * m5;
+
+        m0 * inv0 + m1 * inv4 + m2 * inv8 + m3 * inv12
+    }
+
+}
+
+#[cfg(test)] mod tests {
+    use crate::matrix::Matrix;
+    use crate::vec::Vector;
+
+    #[test] fn determinant() {
+        let m = Matrix::new_rows([
+            Vector::new([4, 3, 2, 2]),
+            Vector::new([0, 1, -3, 3]),
+            Vector::new([0, -1, 3, 3]),
+            Vector::new([0, 3, 1, 1]),
+        ]);
+        assert_eq!(m.determinant(), -240);
+    }
 }
