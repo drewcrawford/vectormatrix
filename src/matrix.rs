@@ -1,4 +1,5 @@
 mod m3x3;
+mod m4x4;
 
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
