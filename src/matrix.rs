@@ -7,6 +7,13 @@ use core::mem::MaybeUninit;
 use crate::types::sealed::{Constants};
 use crate::vector::Vector;
 
+/**
+A matrix type.
+
+The internal storage of the matrix is column-major, but you can also use row-major accessors.
+
+The type has no defined memory layout - convert to repr(c) if needed.
+*/
 #[derive(Copy,Clone,PartialEq)]
 pub struct Matrix<T, const R: usize, const C: usize> {
     columns: [Vector<T,R>; C],

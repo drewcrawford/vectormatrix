@@ -22,8 +22,30 @@ impl<T: Constants, const N: usize> Vector<T, N> {
     Creates a new vector with all components set to zero.
 */
     pub const ZERO: Self = Self([T::ZERO; N]);
+    /**
+    Creates a new vector with all components set to one.
+*/
     pub const ONE: Self = Self([T::ONE; N]);
 
+}
+
+/**
+A normalized vector.
+*/
+pub struct NormalizedVector<T, const N: usize>(Vector<T, N>);
+
+impl<T, const N: usize> NormalizedVector<T, N> {
+
+    /**
+    Retrieves the underlying vector.
+*/
+    #[inline] pub fn into_vector(self) -> Vector<T, N> {
+        self.0
+    }
+
+    #[inline] pub const fn as_vector(&self) -> &Vector<T, N> {
+        &self.0
+    }
 }
 
 //getters
@@ -404,8 +426,8 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
 
 //norm
 impl <T: core::ops::Div<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vector<T, N> {
-    #[inline] pub fn normalize(self) -> Self {
-        self / self.length()
+    #[inline] pub fn normalize(self) -> NormalizedVector<T,N> {
+        NormalizedVector(self / self.length())
     }
 }
 
@@ -677,7 +699,7 @@ impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vec
     #[test] fn normalize() {
         let a = Vector::new([3.0,4.0]);
         let b = a.normalize();
-        assert_eq!(b.length(), 1.0);
+        assert_eq!(b.as_vector().length(), 1.0);
     }
 
     #[test] fn map() {
