@@ -5,7 +5,7 @@ mod m2x2;
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
 use crate::types::Constants;
-use crate::vec::Vector;
+use crate::vector::Vector;
 
 #[derive(Copy,Clone,PartialEq)]
 pub struct Matrix<T, const R: usize, const C: usize> {
@@ -615,7 +615,7 @@ where
 #[cfg(test)]
 mod tests {
     #[test] fn test() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
@@ -627,7 +627,7 @@ mod tests {
     }
 
     #[test] fn test_from_array() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m = Matrix::<f32, 2, 3>::new_from_array([
             1.0, 2.0, 3.0,
@@ -638,7 +638,7 @@ mod tests {
         assert_eq!(m.columns[2], Vector::new([3.0, 6.0]));
     }
     #[test] fn test_debug() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
@@ -650,7 +650,7 @@ mod tests {
     }
 
     #[test] fn test_elementwise() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
@@ -678,7 +678,7 @@ mod tests {
     }
 
     #[test] fn map() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
@@ -692,7 +692,7 @@ mod tests {
     }
 
     #[test] fn rows_cols() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
@@ -703,7 +703,7 @@ mod tests {
     }
 
     #[test] fn test_mul() {
-        use crate::vec::Vector;
+        use crate::vector::Vector;
         use crate::matrix::Matrix;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),

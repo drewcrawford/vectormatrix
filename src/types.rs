@@ -74,21 +74,39 @@ pub trait Float {
 }
 
 impl Float for f32 {
-    #[inline] fn sqrt(self) -> Self { self.sqrt() }
+    #[inline] fn sqrt(self) -> Self {
+        let sqrt_fn: fn(f32) -> f32 = f32::sqrt;
+        sqrt_fn(self)
+    }
     #[inline] fn eq_approx(self, other: Self, tolerance: Self) -> bool {
         (self - other).abs() < tolerance
     }
 
-    #[inline] fn sin(self) -> Self { self.sin() }
-    #[inline] fn cos(self) -> Self { self.cos() }
+    #[inline] fn sin(self) -> Self {
+        let sin_fn: fn(f32) -> f32 = f32::sin;
+        sin_fn(self)
+    }
+    #[inline] fn cos(self) -> Self {
+        let cos_fn: fn(f32) -> f32 = f32::cos;
+        cos_fn(self)
+    }
 }
 impl Float for f64 {
-    #[inline] fn sqrt(self) -> Self { self.sqrt() }
+    #[inline] fn sqrt(self) -> Self {
+        let sqrt_fn: fn(f64) -> f64 = f64::sqrt;
+        sqrt_fn(self)
+    }
     #[inline] fn eq_approx(self, other: Self, tolerance: Self) -> bool {
         (self - other).abs() < tolerance
     }
 
-    #[inline] fn sin(self) -> Self { self.sin() }
-    #[inline] fn cos(self) -> Self { self.cos() }
+    #[inline] fn sin(self) -> Self {
+        let sin_fn: fn(f64) -> f64 = f64::sin;
+        sin_fn(self)
+    }
+    #[inline] fn cos(self) -> Self {
+        let cos_fn: fn(f64) -> f64 = f64::cos;
+        cos_fn(self)
+    }
 
 }

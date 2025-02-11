@@ -4,7 +4,7 @@
 
 use crate::matrix::Matrix;
 use crate::types::{Constants, Float};
-use crate::vec::Vector;
+use crate::vector::Vector;
 
 impl<T: Constants> Matrix<T, 3, 3> {
     /**
@@ -147,24 +147,24 @@ impl<T: Constants> Matrix<T, 3, 3> {
 #[cfg(test)] mod tests {
     #[test] fn test_determinant() {
         let m = crate::matrix::Matrix::new_columns([
-            crate::vec::Vector::new([3, 7, 0]),
-            crate::vec::Vector::new([1, -4, 0]),
-            crate::vec::Vector::new([0, 0, 1]),
+            crate::vector::Vector::new([3, 7, 0]),
+            crate::vector::Vector::new([1, -4, 0]),
+            crate::vector::Vector::new([0, 0, 1]),
         ]);
         assert_eq!(m.determinant(), -19);
     }
 
     #[test] fn inverse() {
         let m = crate::matrix::Matrix::new_columns([
-            crate::vec::Vector::new([3.0f32, 7.0, 0.0]),
-            crate::vec::Vector::new([1.0, -4.0, 0.0]),
-            crate::vec::Vector::new([0.0, 0.0, 1.0]),
+            crate::vector::Vector::new([3.0f32, 7.0, 0.0]),
+            crate::vector::Vector::new([1.0, -4.0, 0.0]),
+            crate::vector::Vector::new([0.0, 0.0, 1.0]),
         ]);
         let inv = m.inverse().unwrap();
         assert_eq!(inv, crate::matrix::Matrix::new_columns([
-            crate::vec::Vector::new([4.0/19.0, 7.0/19.0, 0.0]),
-            crate::vec::Vector::new([1.0/19.0, -3.0/19.0, 0.0]),
-            crate::vec::Vector::new([0.0, 0.0, 1.0]),
+            crate::vector::Vector::new([4.0/19.0, 7.0/19.0, 0.0]),
+            crate::vector::Vector::new([1.0/19.0, -3.0/19.0, 0.0]),
+            crate::vector::Vector::new([0.0, 0.0, 1.0]),
         ]));
     }
 

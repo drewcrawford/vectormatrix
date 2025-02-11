@@ -4,7 +4,7 @@
 
 use crate::matrix::Matrix;
 use crate::types::{Constants, Float};
-use crate::vec::Vector;
+use crate::vector::Vector;
 
 impl<T> Matrix<T,4,4> {
     /**
@@ -344,7 +344,7 @@ impl<T> Matrix<T,4,4> {
 
 #[cfg(test)] mod tests {
     use crate::matrix::Matrix;
-    use crate::vec::Vector;
+    use crate::vector::Vector;
 
     #[test] fn determinant() {
         let m = Matrix::new_rows([

@@ -590,7 +590,7 @@ impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vec
 
 
 #[cfg(test)] mod tests {
-    use crate::vec::Vector;
+    use crate::vector::Vector;
 
     #[test] fn elementwise() {
         let a = Vector::new([1,2,3]);

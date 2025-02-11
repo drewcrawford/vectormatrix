@@ -4,7 +4,7 @@
 
 use crate::matrix::Matrix;
 use crate::types::Constants;
-use crate::vec::Vector;
+use crate::vector::Vector;
 
 impl<T> Matrix<T,2,2> {
     #[inline] pub fn determinant(self) -> T where T: Clone + core::ops::Sub<Output=T> + core::ops::Mul<Output=T> {
@@ -39,7 +39,7 @@ impl<T> Matrix<T,2,2> {
 
 #[cfg(test)] mod tests {
     use crate::matrix::Matrix;
-    use crate::vec::Vector;
+    use crate::vector::Vector;
 
     #[test] fn determinant() {
         let m = Matrix::new_rows([
