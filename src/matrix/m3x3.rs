@@ -88,10 +88,33 @@ impl<T: Constants> Matrix<T, 3, 3> {
         ])
     }
 
+    /**
+    Finds the determinant of the matrix.
+    */
+    #[inline] pub fn determinant(self) -> T where T: Clone + core::ops::Sub<Output=T> + core::ops::Mul<Output=T> + core::ops::Add<Output=T> {
+        let a = self.columns()[0].x().clone();
+        let b = self.columns()[1].x().clone();
+        let c = self.columns()[2].x().clone();
+        let d = self.columns()[0].y().clone();
+        let e = self.columns()[1].y().clone();
+        let f = self.columns()[2].y().clone();
+        let g = self.columns()[0].z().clone();
+        let h = self.columns()[1].z().clone();
+        let i = self.columns()[2].z().clone();
+        a.clone() * e.clone() * i.clone() + b.clone() * f.clone() * g.clone() + c.clone() * d.clone() * h.clone() - c * e * g - b * d * i - a * f * h
+    }
+
 }
 
 #[cfg(test)] mod tests {
-
+    #[test] fn test_determinant() {
+        let m = crate::matrix::Matrix::new_columns([
+            crate::vec::Vector::new([3, 7, 0]),
+            crate::vec::Vector::new([1, -4, 0]),
+            crate::vec::Vector::new([0, 0, 1]),
+        ]);
+        assert_eq!(m.determinant(), -19);
+    }
 
 
 }
