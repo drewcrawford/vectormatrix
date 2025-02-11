@@ -3,7 +3,7 @@
 */
 
 use crate::matrix::Matrix;
-use crate::types::{Constants, Float};
+use crate::types::sealed::{Constants, Float};
 use crate::vector::Vector;
 
 impl<T: Constants> Matrix<T, 3, 3> {

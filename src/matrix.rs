@@ -4,7 +4,7 @@ mod m2x2;
 
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
-use crate::types::Constants;
+use crate::types::sealed::{Constants};
 use crate::vector::Vector;
 
 #[derive(Copy,Clone,PartialEq)]
@@ -491,7 +491,7 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
 
 //eq_approx
 impl<T, const R: usize, const C: usize> Matrix<T,R,C>
-where T: Clone + crate::types::Float
+where T: Clone + crate::types::sealed::Float
 {
     pub fn eq_approx(self, other: Self, tolerance: T) -> bool {
         for c in 0..C {

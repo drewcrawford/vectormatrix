@@ -1,6 +1,6 @@
 use core::mem::MaybeUninit;
 use crate::matrix::Matrix;
-use crate::types::{Constants, Float};
+use crate::types::sealed::{Constants, Float};
 
 /**
 A vector type.

@@ -10,10 +10,8 @@
 * i32
 * i64
 */
-pub trait Constants {
-    const ZERO: Self;
-    const ONE: Self;
-}
+
+use crate::types::sealed::{Constants, Float};
 
 impl Constants for f32 {
     const ZERO: Self = 0.0;
@@ -64,14 +62,20 @@ impl Constants for i64 {
     const ZERO: Self = 0;
     const ONE: Self = 1;
 }
+pub(crate) mod sealed {
+    pub trait Float {
+        fn sqrt(self) -> Self;
+        fn eq_approx(self, other: Self, tolerance: Self) -> bool;
 
-pub trait Float {
-    fn sqrt(self) -> Self;
-    fn eq_approx(self, other: Self, tolerance: Self) -> bool;
-
-    fn sin(self) -> Self;
-    fn cos(self) -> Self;
+        fn sin(self) -> Self;
+        fn cos(self) -> Self;
+    }
+    pub trait Constants {
+        const ZERO: Self;
+        const ONE: Self;
+    }
 }
+
 
 impl Float for f32 {
     #[inline] fn sqrt(self) -> Self {
