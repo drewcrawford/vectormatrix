@@ -2,5 +2,13 @@
 name = "vectormatrix"
 version = "0.1.0"
 edition = "2021"
-
+authors = ["Drew Crawford <drew@sealedabstract.com>"]
+description = "Idiomatic Matrix and Vector types for Rust"
+homepage = "https://sealedabstract.com/code/vectormatrix"
+repository = "https://github.com/drewcrawford/vectormatrix"
+license = "MIT OR Apache-2.0"
+keywords = ["matrix","vector","math","matrices","linear-algebra"]
+exclude = [".*"]
+categories = ["mathematics","no-std","no-std::no-alloc"]
+rust-version = "1.84.1"
 [dependencies]
