@@ -21,24 +21,45 @@ pub struct Matrix<T, const R: usize, const C: usize> {
 
 impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
 
+    /**
+    An uninitialized matrix.
+    */
     pub const UNINIT: Matrix<MaybeUninit<T>,R,C> = Matrix {
         columns: [Vector::UNINIT; C],
     };
 
-    pub const fn new_columns(columns: [Vector<T, R>; C]) -> Self {
+    /**
+    Creates a new matrix from the given columns.
+
+    This generally the 'fastest' way to construct the underlying matrix
+    since it is basically already in the correct layout.
+
+    */
+    #[inline] pub const fn new_columns(columns: [Vector<T, R>; C]) -> Self {
         Self {
             columns,
         }
     }
 
-    pub fn new_rows(rows: [Vector<T, C>; R]) -> Self
+    /**
+    Creates a new matrix from the given rows.
+
+    This is a bit slower than `new_columns` since it requires a transpose.
+    */
+    #[inline] pub fn new_rows(rows: [Vector<T, C>; R]) -> Self
     where
         T: Clone
     {
         Matrix::new_columns(rows).transpose()
     }
 
-    pub fn new_from_array<const L: usize>(arr: [T; L]) -> Self
+    /**
+    Creates a new matrix from an array of elements.
+
+    This requires the array size to be compatible with the matrix type.
+    */
+
+    #[inline] pub fn new_from_array<const L: usize>(arr: [T; L]) -> Self
     where
         T: Clone
     {
@@ -58,6 +79,9 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
         }
     }
 
+    /**
+    Calculates the transpose of the matrix.
+    */
     pub fn transpose(self) -> Matrix<T, C, R>
     where
         T: Clone
@@ -82,6 +106,9 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
 
 //assume_init
 impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>,R,C> {
+    /**
+    Assumes that each element in the matrix is initialized.
+*/
     pub unsafe fn assume_init(self) -> Matrix<T,R,C> {
         let columns = self.columns.map(|maybe| unsafe { maybe.assume_init() });
         Matrix {
@@ -170,9 +197,15 @@ impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: 
 
 //constants
 impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
+    /**
+    A matrix where all elements are zero.
+*/
     pub const ZERO: Self = Self {
         columns: [Vector::ZERO; C],
     };
+    /**
+    A matrix where all elements are 1.
+*/
     pub const ONE: Self = Self {
         columns: [Vector::ONE; C],
     };

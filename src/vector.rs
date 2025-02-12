@@ -5,7 +5,7 @@ use crate::types::sealed::{Constants, Float};
 /**
 A vector type.
 */
-#[derive(Debug,Copy,Clone,PartialEq)]
+#[derive(Debug,Copy,Clone,PartialEq,Eq,PartialOrd, Ord, Hash)]
 pub struct Vector<T, const N: usize>([T; N]);
 
 impl <T, const N: usize> Vector<T, N> {
@@ -14,6 +14,13 @@ impl <T, const N: usize> Vector<T, N> {
 */
     pub const fn new(value: [T; N]) -> Self {
         Self(value)
+    }
+
+    /**
+    Returns the inner array.
+*/
+    pub fn into_inner(self) -> [T; N] {
+        self.0
     }
 }
 
@@ -612,6 +619,104 @@ impl <T, const N: usize>  Vector<T, N> where T: Clone
     }
 }
 
+//boilerplate
+
+impl<T, const N: usize> Default for Vector<T, N> where T: Default + Copy {
+    fn default() -> Self {
+        Vector::new([T::default(); N])
+    }
+}
+
+//boilerplate: tuple constructors
+impl<T> From<T> for Vector<T,1> {
+    fn from(value: T) -> Self {
+        Vector::new([value])
+    }
+}
+
+impl<T> From<(T,)> for Vector<T,1> {
+    fn from(value: (T,)) -> Self {
+        Vector::new([value.0])
+    }
+}
+
+impl<T> From<(T,T)> for Vector<T,2> {
+    fn from(value: (T,T)) -> Self {
+        Vector::new([value.0, value.1])
+    }
+}
+
+impl<T> From<(T,T,T)> for Vector<T,3> {
+    fn from(value: (T,T,T)) -> Self {
+        Vector::new([value.0, value.1, value.2])
+    }
+}
+
+impl<T> From<(T,T,T,T)> for Vector<T,4> {
+    fn from(value: (T,T,T,T)) -> Self {
+        Vector::new([value.0, value.1, value.2, value.3])
+    }
+}
+
+
+impl<T> From<Vector<T,1>> for (T,) {
+    fn from(value: Vector<T, 1>) -> Self {
+        let a = value.0;
+        let mut iter = a.into_iter();
+        (iter.next().unwrap(),)
+    }
+}
+
+impl<T> From<Vector<T, 2>> for (T,T) {
+    fn from(value: Vector<T, 2>) -> Self {
+        let a = value.0;
+        let mut iter = a.into_iter();
+        (iter.next().unwrap(), iter.next().unwrap())
+    }
+}
+
+impl<T> From<Vector<T, 3>> for (T,T,T) {
+    fn from(value: Vector<T, 3>) -> Self {
+        let a = value.0;
+        let mut iter = a.into_iter();
+        (iter.next().unwrap(), iter.next().unwrap(), iter.next().unwrap())
+    }
+}
+
+impl<T> From<Vector<T, 4>> for (T,T,T,T) {
+    fn from(value: Vector<T, 4>) -> Self {
+        let a = value.0;
+        let mut iter = a.into_iter();
+        (iter.next().unwrap(), iter.next().unwrap(), iter.next().unwrap(), iter.next().unwrap())
+    }
+}
+
+impl<T, const N: usize> From<Vector<T,N>> for [T; N] {
+    fn from(value: Vector<T, N>) -> Self {
+        value.0
+    }
+}
+
+impl<T, const N: usize> From<[T; N]> for Vector<T,N> {
+    fn from(value: [T; N]) -> Self {
+        Vector::new(value)
+    }
+}
+
+//asref/asmut
+
+impl<T, const N: usize> core::convert::AsRef<[T; N]> for Vector<T,N> {
+    fn as_ref(&self) -> &[T; N] {
+        &self.0
+    }
+}
+
+impl<T, const N: usize> core::convert::AsMut<[T; N]> for Vector<T,N> {
+    fn as_mut(&mut self) -> &mut [T; N] {
+        &mut self.0
+    }
+}
+
 impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vector<T,M> where T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T> {
     type Output = Matrix<T,1,N>;
 
@@ -755,6 +860,11 @@ impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vec
         let a = Vector::new([1.0f32,2.0,3.0,4.0]);
         let b = a.mix(Vector::new([4.0f32,3.0,2.0,1.0]), 0.5);
         assert_eq!(b.0, [2.5,2.5,2.5,2.5]);
+    }
+
+    #[test] fn test_convert() {
+        let a = Vector::new([1,2,3]);
+        let _b: (i32, i32, i32) = a.into();
     }
 
 
