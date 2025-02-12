@@ -38,7 +38,11 @@ impl<T: Constants, const N: usize> Vector<T, N> {
 
 /**
 A normalized vector.
+
+This is a vector that has been normalized to have a length of 1.  This property
+is enforced by the typesystem.
 */
+#[derive(Debug, Copy,Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct NormalizedVector<T, const N: usize>(Vector<T, N>);
 
 impl<T, const N: usize> NormalizedVector<T, N> {
@@ -401,7 +405,7 @@ impl<T: core::ops::DivAssign + Clone, const N: usize> core::ops::DivAssign<T> fo
 }
 
 //length squared
-impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, const N: usize>  Vector<T, N> {
+impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: usize>  Vector<T, N> {
     #[inline] pub fn length_squared(self) -> T {
         let mut result = self.0[0].clone() * self.0[0].clone();
         for i in 1..N {
@@ -411,7 +415,7 @@ impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T>, con
     }
 }
 
-impl <T: core::ops::Mul<Output=T> + Clone + Copy + core::ops::Add<Output=T> + Float, const N: usize> Vector<T,N> {
+impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T> + Float, const N: usize> Vector<T,N> {
     #[inline] pub fn length(self) -> T {
         self.length_squared().sqrt()
     }
@@ -432,9 +436,9 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
 }
 
 //norm
-impl <T: core::ops::Div<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vector<T, N> {
+impl <T: core::ops::Div<Output=T> + Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vector<T, N> {
     #[inline] pub fn normalize(self) -> NormalizedVector<T,N> {
-        NormalizedVector(self / self.length())
+        NormalizedVector(self.clone() / self.length())
     }
 }
 
@@ -724,6 +728,33 @@ impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vec
         self.to_row().mul_matrix(rhs)
     }
 }
+
+
+//NormalizedVector boilerplate
+impl<T, const N: usize> From<Vector<T, N>> for NormalizedVector<T, N> where T: core::ops::Add<Output=T> + Clone + core::ops::Div<Output=T> + core::ops::Mul<Output=T> + Float {
+    ///Converts to NormalizedVector by normalizing the vector.
+    fn from(value: Vector<T, N>) -> Self {
+        value.normalize()
+    }
+}
+
+impl<T, const N: usize> From<NormalizedVector<T, N>> for Vector<T, N> {
+    ///Converts from NormalizedVector by returning the underlying vector.
+    fn from(value: NormalizedVector<T, N>) -> Self {
+        value.into_vector()
+    }
+}
+
+impl<T, const N: usize> AsRef<Vector<T, N>> for NormalizedVector<T, N> {
+    ///Returns a reference to the underlying vector.
+    fn as_ref(&self) -> &Vector<T, N> {
+        self.as_vector()
+    }
+}
+//no support for asmut since this breaks normalization.
+
+
+
 
 
 #[cfg(test)] mod tests {
