@@ -14,7 +14,7 @@ The internal storage of the matrix is column-major, but you can also use row-maj
 
 The type has no defined memory layout - convert to repr(c) if needed.
 */
-#[derive(Copy,Clone,PartialEq)]
+#[derive(Copy,Clone,PartialEq,Eq,PartialOrd, Ord, Hash)]
 pub struct Matrix<T, const R: usize, const C: usize> {
     columns: [Vector<T,R>; C],
 }
@@ -648,6 +648,41 @@ where
         self.mul_matrix(other.to_col())
     }
 }
+
+//boilerplate
+
+impl<T: Default, const R: usize, const C: usize> Default for Matrix<T,R,C> where T: Copy {
+    fn default() -> Self {
+        Self::new_columns([Default::default(); C])
+    }
+}
+
+//from/into
+impl<T, const R: usize, const C: usize> From<[Vector<T,R>; C]> for Matrix<T,R,C> {
+    fn from(arr: [Vector<T,R>; C]) -> Self {
+        Self::new_columns(arr)
+    }
+}
+
+impl<T, const R: usize, const C: usize> From<Matrix<T,R,C>> for [Vector<T,R>; C] {
+    fn from(m: Matrix<T,R,C>) -> Self {
+        m.columns
+    }
+}
+
+//asref / asmut
+impl<T, const R: usize, const C: usize> AsRef<[Vector<T,R>; C]> for Matrix<T,R,C> {
+    fn as_ref(&self) -> &[Vector<T,R>; C] {
+        &self.columns
+    }
+}
+
+impl<T, const R: usize, const C: usize> AsMut<[Vector<T,R>; C]> for Matrix<T,R,C> {
+    fn as_mut(&mut self) -> &mut [Vector<T,R>; C] {
+        &mut self.columns
+    }
+}
+
 
 
 
