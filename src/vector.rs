@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: MIT OR Apache-2.0
 use core::mem::MaybeUninit;
 use crate::matrix::Matrix;
 use crate::types::sealed::{Constants, Float};

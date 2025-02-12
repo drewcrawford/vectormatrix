@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: MIT OR Apache-2.0
-/*!
+# vectormatrix
+
 Idiomatic Matrix and Vector types for Rust.
 
 ![logo](art/logo.png)
@@ -38,13 +38,3 @@ Most obvious matrix and vector operations including:
 * Use `repr(Rust)` so that the compiler may optimize memory for simd, etc.
   (Convert to your own `repr(C)` type if you need specific memory layout).
 * API design should allow for simd or hardware accelerated ops 'in the future'.
-
-*/
-#![cfg_attr(not(test), no_std)]
-extern crate alloc;
-
-pub mod vector;
-mod types;
-pub mod matrix;
-
-
