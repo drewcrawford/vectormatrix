@@ -418,7 +418,7 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: u
 
 impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T> + Float, const N: usize> Vector<T,N> {
     #[inline] pub fn length(self) -> T {
-        self.length_squared().f_sqrt()
+        self.length_squared().sqrt()
     }
 }
 
@@ -432,7 +432,7 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
             let diff = self.0[i].clone() - other.0[i].clone();
             result = result + diff * diff;
         }
-        result.f_sqrt()
+        result.sqrt()
     }
 }
 
@@ -898,7 +898,6 @@ impl<T, const N: usize> AsRef<Vector<T, N>> for NormalizedVector<T, N> {
         let a = Vector::new([1,2,3]);
         let _b: (i32, i32, i32) = a.into();
     }
-
 
 
 }

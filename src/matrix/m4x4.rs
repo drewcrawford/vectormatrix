@@ -42,8 +42,8 @@ impl<T> Matrix<T,4,4> {
     */
 
     #[inline] pub fn rotation_matrix_x(theta: T) -> Self where T: Float + core::ops::Neg<Output=T> + Clone + Constants {
-        let s = theta.clone().f_sin();
-        let c = theta.f_cos();
+        let s = theta.clone().sin();
+        let c = theta.cos();
         Matrix::new_columns([
             Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]),
             Vector::new([T::ZERO, c.clone(), s.clone(), T::ZERO]),
@@ -65,8 +65,8 @@ impl<T> Matrix<T,4,4> {
     */
 
     #[inline] pub fn rotation_matrix_y(theta: T) -> Self where T: Float + core::ops::Neg<Output=T> + Clone + Constants {
-        let s = theta.clone().f_sin();
-        let c = theta.f_cos();
+        let s = theta.clone().sin();
+        let c = theta.cos();
         Matrix::new_columns([
             Vector::new([c.clone(), T::ZERO, -s.clone(), T::ZERO]),
             Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]),
@@ -88,8 +88,8 @@ impl<T> Matrix<T,4,4> {
     */
 
     #[inline] pub fn rotation_matrix_z(theta: T) -> Self where T: Float + core::ops::Neg<Output=T> + Clone + Constants {
-        let s = theta.clone().f_sin();
-        let c = theta.f_cos();
+        let s = theta.clone().sin();
+        let c = theta.cos();
         Matrix::new_columns([
             Vector::new([c.clone(), s.clone(), T::ZERO, T::ZERO]),
             Vector::new([-s, c, T::ZERO, T::ZERO]),
