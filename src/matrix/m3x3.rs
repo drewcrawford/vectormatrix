@@ -41,8 +41,8 @@ impl<T: Constants> Matrix<T, 3, 3> {
     */
 
     pub fn rotation_matrix(theta: T) -> Self where T: Float + core::ops::Neg<Output=T> + Clone {
-        let s = theta.clone().sin();
-        let c = theta.cos();
+        let s = theta.clone().f_sin();
+        let c = theta.f_cos();
         Matrix::new_columns([
             Vector::new([c.clone(), -s.clone(), T::ZERO]),
             Vector::new([s, c, T::ZERO]),

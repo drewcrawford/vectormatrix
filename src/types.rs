@@ -65,11 +65,11 @@ impl Constants for i64 {
 }
 pub(crate) mod sealed {
     pub trait Float {
-        fn sqrt(self) -> Self;
+        fn f_sqrt(self) -> Self;
         fn eq_approx(self, other: Self, tolerance: Self) -> bool;
 
-        fn sin(self) -> Self;
-        fn cos(self) -> Self;
+        fn f_sin(self) -> Self;
+        fn f_cos(self) -> Self;
     }
     pub trait Constants {
         const ZERO: Self;
@@ -79,7 +79,7 @@ pub(crate) mod sealed {
 
 
 impl Float for f32 {
-    #[inline] fn sqrt(self) -> Self {
+    #[inline] fn f_sqrt(self) -> Self {
         let sqrt_fn: fn(f32) -> f32 = f32::sqrt;
         sqrt_fn(self)
     }
@@ -87,17 +87,17 @@ impl Float for f32 {
         (self - other).abs() < tolerance
     }
 
-    #[inline] fn sin(self) -> Self {
+    #[inline] fn f_sin(self) -> Self {
         let sin_fn: fn(f32) -> f32 = f32::sin;
         sin_fn(self)
     }
-    #[inline] fn cos(self) -> Self {
+    #[inline] fn f_cos(self) -> Self {
         let cos_fn: fn(f32) -> f32 = f32::cos;
         cos_fn(self)
     }
 }
 impl Float for f64 {
-    #[inline] fn sqrt(self) -> Self {
+    #[inline] fn f_sqrt(self) -> Self {
         let sqrt_fn: fn(f64) -> f64 = f64::sqrt;
         sqrt_fn(self)
     }
@@ -105,11 +105,11 @@ impl Float for f64 {
         (self - other).abs() < tolerance
     }
 
-    #[inline] fn sin(self) -> Self {
+    #[inline] fn f_sin(self) -> Self {
         let sin_fn: fn(f64) -> f64 = f64::sin;
         sin_fn(self)
     }
-    #[inline] fn cos(self) -> Self {
+    #[inline] fn f_cos(self) -> Self {
         let cos_fn: fn(f64) -> f64 = f64::cos;
         cos_fn(self)
     }
