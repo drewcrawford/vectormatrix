@@ -40,7 +40,11 @@ Most obvious matrix and vector operations including:
 * API design should allow for simd or hardware accelerated ops 'in the future'.
 
 */
-#![cfg_attr(not(test), no_std)]
+#![no_std] // Always applies to the crate
+
+#[cfg(feature = "std")]
+extern crate std; // Explicitly import std when enabled
+
 extern crate alloc;
 
 pub mod vector;

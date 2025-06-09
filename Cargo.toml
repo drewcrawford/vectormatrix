@@ -12,3 +12,7 @@ exclude = [".*"]
 categories = ["mathematics","no-std","no-std::no-alloc"]
 rust-version = "1.85.0"
 [dependencies]
+
+[features]
+default = ["std"]
+std = []

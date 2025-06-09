@@ -721,7 +721,7 @@ mod tests {
             Vector::new([4.0, 5.0, 6.0]),
         ]);
         use alloc::format;
-        println!("{:?}", m);
+        // println!("{:?}", m);
         assert_eq!(format!("{:?}", m), "   1.000   2.000   3.000\n   4.000   5.000   6.000\n");
     }
 
