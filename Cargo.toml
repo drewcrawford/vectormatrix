@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 keywords = ["matrix","vector","math","matrices","linear-algebra"]
 exclude = [".*"]
 categories = ["mathematics","no-std","no-std::no-alloc"]
-rust-version = "1.85.0"
+rust-version = "1.85.1"
 [dependencies]
 
 [features]
