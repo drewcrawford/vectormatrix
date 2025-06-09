@@ -44,7 +44,6 @@ impl<T> Matrix<T, 4, 4> {
     | 0 0 0 1 |
     ```
     */
-
     #[inline]
     pub fn rotation_matrix_x(theta: T) -> Self
     where
@@ -71,7 +70,6 @@ impl<T> Matrix<T, 4, 4> {
     | 0 0 0 1 |
     ```
     */
-
     #[inline]
     pub fn rotation_matrix_y(theta: T) -> Self
     where
@@ -98,7 +96,6 @@ impl<T> Matrix<T, 4, 4> {
     | 0 0 0 1 |
     ```
     */
-
     #[inline]
     pub fn rotation_matrix_z(theta: T) -> Self
     where
@@ -125,7 +122,6 @@ impl<T> Matrix<T, 4, 4> {
     | 0 0 0 1 |
     ```
     */
-
     #[inline]
     pub const fn scaling_matrix(sx: T, sy: T, sz: T) -> Self
     where
@@ -150,7 +146,6 @@ impl<T> Matrix<T, 4, 4> {
     |0 0 0 1 |
     ```
     */
-
     #[inline]
     pub const fn shear_matrix(sxy: T, sxz: T, syx: T, syz: T, szx: T, szy: T) -> Self
     where

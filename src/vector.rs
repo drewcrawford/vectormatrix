@@ -568,11 +568,7 @@ impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn add_scalar(self, other: T) -> Self {
-        let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() + other.clone();
-        }
-        Self(result)
+        Self(self.0.map(|x| x + other.clone()))
     }
 }
 
@@ -598,11 +594,7 @@ impl<T: core::ops::Sub<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn sub_scalar(self, other: T) -> Self {
-        let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() - other.clone();
-        }
-        Self(result)
+        Self(self.0.map(|x| x - other.clone()))
     }
 }
 
@@ -628,11 +620,7 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn mul_scalar(self, other: T) -> Self {
-        let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() * other.clone();
-        }
-        Self(result)
+        Self(self.0.map(|x| x * other.clone()))
     }
 }
 
@@ -658,11 +646,7 @@ impl<T: core::ops::Div<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn div_scalar(self, other: T) -> Self {
-        let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() / other.clone();
-        }
-        Self(result)
+        Self(self.0.map(|x| x / other.clone()))
     }
 }
 
@@ -1130,15 +1114,15 @@ impl<T: core::cmp::PartialOrd + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn clamp(self, min: T, max: T) -> Self {
-        let mut result = self.0.clone();
-        for i in 0..N {
-            if result[i].clone() < min.clone() {
-                result[i] = min.clone();
-            } else if result[i].clone() > max.clone() {
-                result[i] = max.clone();
+        Self(self.0.map(|x| {
+            if x < min {
+                min.clone()
+            } else if x > max {
+                max.clone()
+            } else {
+                x
             }
-        }
-        Self(result)
+        }))
     }
 }
 

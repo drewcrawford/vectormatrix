@@ -38,7 +38,6 @@ impl<T: Constants> Matrix<T, 3, 3> {
     | 0           0          1 |
     ```
     */
-
     pub fn rotation_matrix(theta: T) -> Self
     where
         T: Float + core::ops::Neg<Output = T> + Clone,
