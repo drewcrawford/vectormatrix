@@ -369,8 +369,8 @@ impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
     #[inline]
     pub fn elementwise_add(self, other: Self) -> Self {
         let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() + other.0[i].clone();
+        for (i, result_item) in result.iter_mut().enumerate().take(N) {
+            *result_item = result_item.clone() + other.0[i].clone();
         }
         Self(result)
     }
@@ -400,8 +400,8 @@ impl<T: core::ops::Sub<Output = T> + Clone, const N: usize> Vector<T, N> {
     #[inline]
     pub fn elementwise_sub(self, other: Self) -> Self {
         let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() - other.0[i].clone();
+        for (i, result_item) in result.iter_mut().enumerate().take(N) {
+            *result_item = result_item.clone() - other.0[i].clone();
         }
         Self(result)
     }
@@ -431,8 +431,8 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
     #[inline]
     pub fn elementwise_mul(self, other: Self) -> Self {
         let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() * other.0[i].clone();
+        for (i, result_item) in result.iter_mut().enumerate().take(N) {
+            *result_item = result_item.clone() * other.0[i].clone();
         }
         Self(result)
     }
@@ -462,8 +462,8 @@ impl<T: core::ops::Div<Output = T> + Clone, const N: usize> Vector<T, N> {
     #[inline]
     pub fn elementwise_div(self, other: Self) -> Self {
         let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] = result[i].clone() / other.0[i].clone();
+        for (i, result_item) in result.iter_mut().enumerate().take(N) {
+            *result_item = result_item.clone() / other.0[i].clone();
         }
         Self(result)
     }
@@ -1157,8 +1157,8 @@ impl<
     #[inline]
     pub fn mix(self, other: Self, weight: T) -> Self {
         let mut result = self.0.clone();
-        for i in 0..N {
-            result[i] =
+        for (i, result_item) in result.iter_mut().enumerate().take(N) {
+            *result_item =
                 self.0[i].clone() * (T::ONE - weight.clone()) + other.0[i].clone() * weight.clone();
         }
         Self(result)

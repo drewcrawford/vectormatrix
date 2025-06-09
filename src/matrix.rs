@@ -268,13 +268,13 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
         T: Clone,
     {
         let mut columns = [const { MaybeUninit::uninit() }; R];
-        for r in 0..R {
+        for (r, column_slot) in columns.iter_mut().enumerate().take(R) {
             let mut column = Vector::UNINIT;
             for c in 0..C {
                 column[c] = MaybeUninit::new(self.columns[c][r].clone());
             }
             let column = unsafe { column.assume_init() };
-            columns[r] = MaybeUninit::new(column);
+            *column_slot = MaybeUninit::new(column);
         }
         let arr: [Vector<T, C>; R] = columns.map(|maybe| unsafe { maybe.assume_init() });
         Matrix { columns: arr }
@@ -358,8 +358,8 @@ impl<T: Constants + Clone + core::ops::Add<Output = T>, const R: usize, const C:
     #[inline]
     pub fn elementwise_add(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(
                 self.columns[c]
                     .clone()
                     .elementwise_add(other.columns[c].clone()),
@@ -410,8 +410,8 @@ impl<T: Constants + Clone + core::ops::Sub<Output = T>, const R: usize, const C:
     #[inline]
     pub fn elementwise_sub(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(
                 self.columns[c]
                     .clone()
                     .elementwise_sub(other.columns[c].clone()),
@@ -441,8 +441,8 @@ impl<T: Constants + Clone + core::ops::Mul<Output = T>, const R: usize, const C:
     #[inline]
     pub fn elementwise_mul(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(
                 self.columns[c]
                     .clone()
                     .elementwise_mul(other.columns[c].clone()),
@@ -464,8 +464,8 @@ impl<T: Constants + Clone + core::ops::Div<Output = T>, const R: usize, const C:
     #[inline]
     pub fn elementwise_div(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(
                 self.columns[c]
                     .clone()
                     .elementwise_div(other.columns[c].clone()),
@@ -754,8 +754,8 @@ impl<T: Clone + core::ops::Add<Output = T>, const R: usize, const C: usize> Matr
     #[inline]
     pub fn add_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().add_scalar(other.clone()));
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(self.columns[c].clone().add_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
         Self { columns: c }
@@ -783,8 +783,8 @@ impl<T: Clone + core::ops::Sub<Output = T>, const R: usize, const C: usize> Matr
     #[inline]
     pub fn sub_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().sub_scalar(other.clone()));
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(self.columns[c].clone().sub_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
         Self { columns: c }
@@ -812,8 +812,8 @@ impl<T: Clone + core::ops::Mul<Output = T>, const R: usize, const C: usize> Matr
     #[inline]
     pub fn mul_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().mul_scalar(other.clone()));
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(self.columns[c].clone().mul_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
         Self { columns: c }
@@ -841,8 +841,8 @@ impl<T: Clone + core::ops::Div<Output = T>, const R: usize, const C: usize> Matr
     #[inline]
     pub fn div_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().div_scalar(other.clone()));
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(self.columns[c].clone().div_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
         Self { columns: c }
@@ -968,8 +968,8 @@ impl<T: Clone, const R: usize, const C: usize> Matrix<T, R, C> {
     /// ```
     pub fn map<F: FnMut(T) -> T>(self, mut f: F) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
-        for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().map(&mut f));
+        for (c, column_slot) in columns.iter_mut().enumerate().take(C) {
+            *column_slot = MaybeUninit::new(self.columns[c].clone().map(&mut f));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
         Self { columns: c }
