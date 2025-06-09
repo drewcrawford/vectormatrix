@@ -779,10 +779,10 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
     /// assert!((distance - 7.0710678f32).abs() < 0.0001);
     /// ```
     #[inline] pub fn euclid_distance_to(self, other: Self) -> T {
-        let mut result = self.0[0].clone() - other.0[0].clone();
+        let mut result = self.0[0] - other.0[0];
         result = result * result;
         for i in 1..N {
-            let diff = self.0[i].clone() - other.0[i].clone();
+            let diff = self.0[i] - other.0[i];
             result = result + diff * diff;
         }
         result.sqrt()
@@ -843,9 +843,9 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
     /// assert_eq!(cross.into_inner(), [0, 0, 1]);
     /// ```
     #[inline] pub fn cross(self, other: Self) -> Self {
-        let x = self.y().clone() * other.z().clone() - self.z().clone() * other.y().clone();
-        let y = self.z().clone() * other.x().clone() - self.x().clone() * other.z().clone();
-        let z = self.x().clone() * other.y().clone() - self.y().clone() * other.x().clone();
+        let x = *self.y() * *other.z() - *self.z() * *other.y();
+        let y = *self.z() * *other.x() - *self.x() * *other.z();
+        let z = *self.x() * *other.y() - *self.y() * *other.x();
         Vector::new([x,y,z])
     }
 }

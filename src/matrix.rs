@@ -899,7 +899,7 @@ impl<T: Clone, const R: usize, const C: usize> Matrix<T,R,C> {
     pub fn map<F: FnMut(T) -> T>(self, mut f: F) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().map(|v| f(v)));
+            columns[c] = MaybeUninit::new(self.columns[c].clone().map(&mut f));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
         Self {
