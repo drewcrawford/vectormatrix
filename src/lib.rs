@@ -2,7 +2,7 @@
 /*!
 Idiomatic Matrix and Vector types for Rust.
 
-![logo](art/logo.png)
+![logo](../../../art/logo.png)
 
 This crate implements small stack-allocated Vector and Matrix types with the obvious semantics and operations.
 `no_std` support and zero dependencies.
