@@ -13,7 +13,7 @@ impl<T> Matrix<T,4,4> {
 
     This returns the matrix
 
-    ```ignore
+    ```text
     | 1 0 0 dx |
     | 0 1 0 dy |
     | 0 0 1 dz |
@@ -33,7 +33,7 @@ impl<T> Matrix<T,4,4> {
     Constructs a 4x4 matrix that applies a counterclockwise rotation of `theta` radians around the x axis.
 
     This returns the matrix
-    ```ignore
+    ```text
     | 1 0 0 0 |
     | 0 cos(theta) -sin(theta) 0 |
     | 0 sin(theta)  cos(theta) 0 |
@@ -56,7 +56,7 @@ impl<T> Matrix<T,4,4> {
     Constructs a 4x4 matrix that applies a counterclockwise rotation of `theta` radians around the y axis.
 
     This returns the matrix
-    ```ignore
+    ```text
     | cos(theta) 0 sin(theta) 0 |
     | 0 1 0 0 |
     | -sin(theta) 0 cos(theta) 0 |
@@ -79,7 +79,7 @@ impl<T> Matrix<T,4,4> {
     Constructs a 4x4 matrix that applies a counterclockwise rotation of `theta` radians around the z axis.
 
     This returns the matrix
-    ```ignore
+    ```text
     | cos(theta) -sin(theta) 0 0 |
     | sin(theta)  cos(theta) 0 0 |
     | 0 0 1 0 |
@@ -102,7 +102,7 @@ impl<T> Matrix<T,4,4> {
     Constructs a 4x4 matrix that applies a scaling operation.
 
     This returns the matrix
-    ```ignore
+    ```text
     | sx 0 0 0 |
     | 0 sy 0 0 |
     | 0 0 sz 0 |
@@ -123,7 +123,7 @@ impl<T> Matrix<T,4,4> {
     Constructs a 4x4 matrix that applies a shear operation.
 
     This returns the matrix
-    ```ignore
+    ```text
     |1 sxy sxz 0 |
     |syx 1 syz 0 |
     |szx szy 1 0 |

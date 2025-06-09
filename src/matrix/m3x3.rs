@@ -13,7 +13,7 @@ impl<T: Constants> Matrix<T, 3, 3> {
 
     This returns the matrix
 
-    ```ignore
+    ```text
     | 1 0 dx |
     | 0 1 dy |
     | 0 0 1  |
@@ -33,7 +33,7 @@ impl<T: Constants> Matrix<T, 3, 3> {
     Constructs a 3x3 matrix that applies a counterclockwise rotation of `theta` radians.
 
     This returns the matrix
-    ```ignore
+    ```text
     | cos(theta) -sin(theta) 0 |
     | sin(theta)  cos(theta) 0 |
     | 0           0          1 |
@@ -56,7 +56,7 @@ impl<T: Constants> Matrix<T, 3, 3> {
     Constructs a 3x3 matrix that applies a scaling operation.
 
     This returns the matrix
-    ```ignore
+    ```text
     | sx 0 0 |
     | 0 sy 0 |
     | 0 0 1 |
@@ -75,7 +75,7 @@ impl<T: Constants> Matrix<T, 3, 3> {
     Constructs a 3x3 matrix that applies a shear operation.
 
     This returns the matrix
-    ```ignore
+    ```text
     | 1  sx 0 |
     | sy 1  0 |
     | 0  0  1 |
