@@ -32,9 +32,9 @@
 //! let cross_product = v1.cross(v2);
 //! ```
 
-use core::mem::MaybeUninit;
 use crate::matrix::Matrix;
 use crate::types::sealed::{Constants, Float};
+use core::mem::MaybeUninit;
 
 /// A mathematical vector with `N` elements of type `T`.
 ///
@@ -63,10 +63,10 @@ use crate::types::sealed::{Constants, Float};
 /// // Convert from tuple
 /// let v2: Vector<f64, 3> = (4.0, 5.0, 6.0).into();
 /// ```
-#[derive(Debug,Copy,Clone,PartialEq,Eq,PartialOrd, Ord, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Vector<T, const N: usize>([T; N]);
 
-impl <T, const N: usize> Vector<T, N> {
+impl<T, const N: usize> Vector<T, N> {
     /// Creates a new vector from an array of elements.
     ///
     /// # Arguments
@@ -113,7 +113,7 @@ impl<T: Constants, const N: usize> Vector<T, N> {
     /// assert_eq!(v.into_inner(), [0.0, 0.0, 0.0]);
     /// ```
     pub const ZERO: Self = Self([T::ZERO; N]);
-    
+
     /// A vector with all components set to one.
     ///
     /// # Examples
@@ -125,7 +125,6 @@ impl<T: Constants, const N: usize> Vector<T, N> {
     /// assert_eq!(v.into_inner(), [1, 1, 1, 1]);
     /// ```
     pub const ONE: Self = Self([T::ONE; N]);
-
 }
 
 /// A vector that is guaranteed to have unit length.
@@ -146,16 +145,15 @@ impl<T: Constants, const N: usize> Vector<T, N> {
 ///
 /// let v = Vector::new([3.0f64, 4.0]);
 /// let normalized = v.normalize();
-/// 
+///
 /// // The normalized vector has length 1
 /// let length = normalized.as_vector().length();
 /// assert!((length - 1.0f64).abs() < 0.0001);
 /// ```
-#[derive(Debug, Copy,Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct NormalizedVector<T, const N: usize>(Vector<T, N>);
 
 impl<T, const N: usize> NormalizedVector<T, N> {
-
     /// Consumes the normalized vector and returns the underlying vector.
     ///
     /// # Examples
@@ -167,7 +165,8 @@ impl<T, const N: usize> NormalizedVector<T, N> {
     /// let normalized = v.normalize();
     /// let vector_back = normalized.into_vector();
     /// ```
-    #[inline] pub fn into_vector(self) -> Vector<T, N> {
+    #[inline]
+    pub fn into_vector(self) -> Vector<T, N> {
         self.0
     }
 
@@ -183,7 +182,8 @@ impl<T, const N: usize> NormalizedVector<T, N> {
     /// let vec_ref = normalized.as_vector();
     /// assert_eq!(vec_ref, &normalized.into_vector());
     /// ```
-    #[inline] pub const fn as_vector(&self) -> &Vector<T, N> {
+    #[inline]
+    pub const fn as_vector(&self) -> &Vector<T, N> {
         &self.0
     }
 }
@@ -196,22 +196,21 @@ mod private {
     impl<T> AtLeastOne for [T; 2] {}
     impl<T> AtLeastOne for [T; 3] {}
     impl<T> AtLeastOne for [T; 4] {}
-    pub trait AtLeastTwo{}
+    pub trait AtLeastTwo {}
     impl<T> AtLeastTwo for [T; 2] {}
     impl<T> AtLeastTwo for [T; 3] {}
     impl<T> AtLeastTwo for [T; 4] {}
 
-    pub trait AtLeastThree{}
+    pub trait AtLeastThree {}
     impl<T> AtLeastThree for [T; 3] {}
     impl<T> AtLeastThree for [T; 4] {}
 
-    pub trait AtLeastFour{}
+    pub trait AtLeastFour {}
     impl<T> AtLeastFour for [T; 4] {}
-
 }
 impl<T, const N: usize> Vector<T, N>
 where
-    [T; N]: private::AtLeastOne
+    [T; N]: private::AtLeastOne,
 {
     /// Returns a reference to the x (first) component.
     ///
@@ -223,10 +222,11 @@ where
     /// let v = Vector::new([1.0, 2.0, 3.0]);
     /// assert_eq!(*v.x(), 1.0);
     /// ```
-    #[inline] pub const fn x(&self) -> &T {
+    #[inline]
+    pub const fn x(&self) -> &T {
         &self.0[0]
     }
-    
+
     /// Returns a mutable reference to the x (first) component.
     ///
     /// # Examples
@@ -238,13 +238,14 @@ where
     /// *v.x_mut() = 5.0;
     /// assert_eq!(*v.x(), 5.0);
     /// ```
-    #[inline] pub const fn x_mut(&mut self) -> &mut T {
+    #[inline]
+    pub const fn x_mut(&mut self) -> &mut T {
         &mut self.0[0]
     }
 }
 impl<T, const N: usize> Vector<T, N>
 where
-    [T; N]: private::AtLeastTwo
+    [T; N]: private::AtLeastTwo,
 {
     /// Returns a reference to the y (second) component.
     ///
@@ -256,10 +257,11 @@ where
     /// let v = Vector::new([1.0, 2.0, 3.0]);
     /// assert_eq!(*v.y(), 2.0);
     /// ```
-    #[inline] pub const fn y(&self) -> &T {
+    #[inline]
+    pub const fn y(&self) -> &T {
         &self.0[1]
     }
-    
+
     /// Returns a mutable reference to the y (second) component.
     ///
     /// # Examples
@@ -271,14 +273,15 @@ where
     /// *v.y_mut() = 5.0;
     /// assert_eq!(*v.y(), 5.0);
     /// ```
-    #[inline] pub const fn y_mut(&mut self) -> &mut T {
+    #[inline]
+    pub const fn y_mut(&mut self) -> &mut T {
         &mut self.0[1]
     }
 }
 
 impl<T, const N: usize> Vector<T, N>
 where
-    [T; N]: private::AtLeastThree
+    [T; N]: private::AtLeastThree,
 {
     /// Returns a reference to the z (third) component.
     ///
@@ -290,10 +293,11 @@ where
     /// let v = Vector::new([1.0, 2.0, 3.0]);
     /// assert_eq!(*v.z(), 3.0);
     /// ```
-    #[inline] pub const fn z(&self) -> &T {
+    #[inline]
+    pub const fn z(&self) -> &T {
         &self.0[2]
     }
-    
+
     /// Returns a mutable reference to the z (third) component.
     ///
     /// # Examples
@@ -305,14 +309,15 @@ where
     /// *v.z_mut() = 5.0;
     /// assert_eq!(*v.z(), 5.0);
     /// ```
-    #[inline] pub const fn z_mut(&mut self) -> &mut T {
+    #[inline]
+    pub const fn z_mut(&mut self) -> &mut T {
         &mut self.0[2]
     }
 }
 
 impl<T, const N: usize> Vector<T, N>
 where
-    [T; N]: private::AtLeastFour
+    [T; N]: private::AtLeastFour,
 {
     /// Returns a reference to the w (fourth) component.
     ///
@@ -324,10 +329,11 @@ where
     /// let v = Vector::new([1.0, 2.0, 3.0, 4.0]);
     /// assert_eq!(*v.w(), 4.0);
     /// ```
-    #[inline] pub const fn w(&self) -> &T {
+    #[inline]
+    pub const fn w(&self) -> &T {
         &self.0[3]
     }
-    
+
     /// Returns a mutable reference to the w (fourth) component.
     ///
     /// # Examples
@@ -339,15 +345,15 @@ where
     /// *v.w_mut() = 5.0;
     /// assert_eq!(*v.w(), 5.0);
     /// ```
-    #[inline] pub const fn w_mut(&mut self) -> &mut T {
+    #[inline]
+    pub const fn w_mut(&mut self) -> &mut T {
         &mut self.0[3]
     }
 }
 
 //elementwise ops
 
-impl<T: core::ops::Add<Output=T> + Clone, const N: usize> Vector<T, N>
-{
+impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Performs element-wise addition with another vector.
     ///
     /// # Examples
@@ -360,7 +366,8 @@ impl<T: core::ops::Add<Output=T> + Clone, const N: usize> Vector<T, N>
     /// let result = v1.elementwise_add(v2);
     /// assert_eq!(result.into_inner(), [5, 7, 9]);
     /// ```
-    #[inline] pub fn elementwise_add(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_add(self, other: Self) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() + other.0[i].clone();
@@ -369,15 +376,15 @@ impl<T: core::ops::Add<Output=T> + Clone, const N: usize> Vector<T, N>
     }
 }
 
-impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  core::ops::Add for Vector<T, N> {
+impl<T: core::ops::Add<Output = T> + Clone, const N: usize> core::ops::Add for Vector<T, N> {
     type Output = Self;
-    #[inline] fn add(self, other: Self) -> Self {
+    #[inline]
+    fn add(self, other: Self) -> Self {
         self.elementwise_add(other)
     }
 }
 
-impl<T: core::ops::Sub<Output=T> + Clone, const N: usize> Vector<T, N>
-{
+impl<T: core::ops::Sub<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Performs element-wise subtraction with another vector.
     ///
     /// # Examples
@@ -390,7 +397,8 @@ impl<T: core::ops::Sub<Output=T> + Clone, const N: usize> Vector<T, N>
     /// let result = v1.elementwise_sub(v2);
     /// assert_eq!(result.into_inner(), [4, 5, 6]);
     /// ```
-    #[inline] pub fn elementwise_sub(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_sub(self, other: Self) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() - other.0[i].clone();
@@ -399,14 +407,15 @@ impl<T: core::ops::Sub<Output=T> + Clone, const N: usize> Vector<T, N>
     }
 }
 
-impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  core::ops::Sub for Vector<T, N> {
+impl<T: core::ops::Sub<Output = T> + Clone, const N: usize> core::ops::Sub for Vector<T, N> {
     type Output = Self;
-    #[inline] fn sub(self, other: Self) -> Self {
+    #[inline]
+    fn sub(self, other: Self) -> Self {
         self.elementwise_sub(other)
     }
 }
 
-impl<T: core::ops::Mul<Output=T> + Clone, const N: usize> Vector<T, N> {
+impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Performs element-wise multiplication with another vector.
     ///
     /// # Examples
@@ -419,7 +428,8 @@ impl<T: core::ops::Mul<Output=T> + Clone, const N: usize> Vector<T, N> {
     /// let result = v1.elementwise_mul(v2);
     /// assert_eq!(result.into_inner(), [10, 18, 28]);
     /// ```
-    #[inline] pub fn elementwise_mul(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_mul(self, other: Self) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() * other.0[i].clone();
@@ -428,14 +438,15 @@ impl<T: core::ops::Mul<Output=T> + Clone, const N: usize> Vector<T, N> {
     }
 }
 
-impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  core::ops::Mul for Vector<T, N> {
+impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> core::ops::Mul for Vector<T, N> {
     type Output = Self;
-    #[inline] fn mul(self, other: Self) -> Self {
+    #[inline]
+    fn mul(self, other: Self) -> Self {
         self.elementwise_mul(other)
     }
 }
 
-impl<T: core::ops::Div<Output=T> + Clone, const N: usize> Vector<T, N> {
+impl<T: core::ops::Div<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Performs element-wise division with another vector.
     ///
     /// # Examples
@@ -448,7 +459,8 @@ impl<T: core::ops::Div<Output=T> + Clone, const N: usize> Vector<T, N> {
     /// let result = v1.elementwise_div(v2);
     /// assert_eq!(result.into_inner(), [5.0, 6.0, 7.0]);
     /// ```
-    #[inline] pub fn elementwise_div(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_div(self, other: Self) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() / other.0[i].clone();
@@ -457,14 +469,15 @@ impl<T: core::ops::Div<Output=T> + Clone, const N: usize> Vector<T, N> {
     }
 }
 
-impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  core::ops::Div for Vector<T, N> {
+impl<T: core::ops::Div<Output = T> + Clone, const N: usize> core::ops::Div for Vector<T, N> {
     type Output = Self;
-    #[inline] fn div(self, other: Self) -> Self {
+    #[inline]
+    fn div(self, other: Self) -> Self {
         self.elementwise_div(other)
     }
 }
 
-impl<T: core::ops::AddAssign + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::AddAssign + Clone, const N: usize> Vector<T, N> {
     /// Adds another vector to this one in place (element-wise).
     ///
     /// # Examples
@@ -477,63 +490,71 @@ impl<T: core::ops::AddAssign + Clone, const N: usize>  Vector<T, N> {
     /// v1.add_elementwise_assign(v2);
     /// assert_eq!(v1.into_inner(), [5, 7, 9]);
     /// ```
-    #[inline] pub fn add_elementwise_assign(&mut self, other: Self) {
+    #[inline]
+    pub fn add_elementwise_assign(&mut self, other: Self) {
         for i in 0..N {
             self.0[i] += other.0[i].clone();
         }
     }
 }
 
-impl<T: core::ops::AddAssign + Clone, const N: usize>  core::ops::AddAssign for Vector<T, N> {
-    #[inline] fn add_assign(&mut self, other: Self) {
+impl<T: core::ops::AddAssign + Clone, const N: usize> core::ops::AddAssign for Vector<T, N> {
+    #[inline]
+    fn add_assign(&mut self, other: Self) {
         self.add_elementwise_assign(other)
     }
 }
 
-impl<T: core::ops::SubAssign + Clone, const N: usize>  Vector<T, N> {
-    #[inline] pub fn sub_elementwise_assign(&mut self, other: Self) {
+impl<T: core::ops::SubAssign + Clone, const N: usize> Vector<T, N> {
+    #[inline]
+    pub fn sub_elementwise_assign(&mut self, other: Self) {
         for i in 0..N {
             self.0[i] -= other.0[i].clone();
         }
     }
 }
 
-impl<T: core::ops::SubAssign + Clone, const N: usize>  core::ops::SubAssign for Vector<T, N> {
-    #[inline] fn sub_assign(&mut self, other: Self) {
+impl<T: core::ops::SubAssign + Clone, const N: usize> core::ops::SubAssign for Vector<T, N> {
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
         self.sub_elementwise_assign(other)
     }
 }
 
-impl<T: core::ops::MulAssign + Clone, const N: usize>  Vector<T, N> {
-    #[inline] fn mul_elementwise_assign(&mut self, other: Self) {
+impl<T: core::ops::MulAssign + Clone, const N: usize> Vector<T, N> {
+    #[inline]
+    fn mul_elementwise_assign(&mut self, other: Self) {
         for i in 0..N {
             self.0[i] *= other.0[i].clone();
         }
     }
 }
 
-impl<T: core::ops::MulAssign + Clone, const N: usize>  core::ops::MulAssign for Vector<T, N> {
-    #[inline] fn mul_assign(&mut self, other: Self) {
+impl<T: core::ops::MulAssign + Clone, const N: usize> core::ops::MulAssign for Vector<T, N> {
+    #[inline]
+    fn mul_assign(&mut self, other: Self) {
         self.mul_elementwise_assign(other)
     }
 }
 
-impl<T: core::ops::DivAssign + Clone, const N: usize>  Vector<T, N> {
-    #[inline] fn div_elementwise_assign(&mut self, other: Self) {
+impl<T: core::ops::DivAssign + Clone, const N: usize> Vector<T, N> {
+    #[inline]
+    fn div_elementwise_assign(&mut self, other: Self) {
         for i in 0..N {
             self.0[i] /= other.0[i].clone();
         }
     }
 }
 
-impl<T: core::ops::DivAssign + Clone, const N: usize>  core::ops::DivAssign for Vector<T, N> {
-    #[inline] fn div_assign(&mut self, other: Self) {
+impl<T: core::ops::DivAssign + Clone, const N: usize> core::ops::DivAssign for Vector<T, N> {
+    #[inline]
+    fn div_assign(&mut self, other: Self) {
         self.div_elementwise_assign(other)
     }
 }
 
 //scalar ops
-impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Adds a scalar value to each element of the vector.
     ///
     /// # Examples
@@ -545,7 +566,8 @@ impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  Vector<T, N> {
     /// let result = v.add_scalar(5);
     /// assert_eq!(result.into_inner(), [6, 7, 8]);
     /// ```
-    #[inline] pub fn add_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn add_scalar(self, other: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() + other.clone();
@@ -554,14 +576,15 @@ impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  Vector<T, N> {
     }
 }
 
-impl<T: core::ops::Add<Output=T> + Clone, const N: usize>  core::ops::Add<T> for Vector<T, N> {
+impl<T: core::ops::Add<Output = T> + Clone, const N: usize> core::ops::Add<T> for Vector<T, N> {
     type Output = Self;
-    #[inline] fn add(self, other: T) -> Self {
+    #[inline]
+    fn add(self, other: T) -> Self {
         self.add_scalar(other)
     }
 }
 
-impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::Sub<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Subtracts a scalar value from each element of the vector.
     ///
     /// # Examples
@@ -573,7 +596,8 @@ impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  Vector<T, N> {
     /// let result = v.sub_scalar(2);
     /// assert_eq!(result.into_inner(), [3, 4, 5]);
     /// ```
-    #[inline] pub fn sub_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn sub_scalar(self, other: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() - other.clone();
@@ -582,14 +606,15 @@ impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  Vector<T, N> {
     }
 }
 
-impl<T: core::ops::Sub<Output=T> + Clone, const N: usize>  core::ops::Sub<T> for Vector<T, N> {
+impl<T: core::ops::Sub<Output = T> + Clone, const N: usize> core::ops::Sub<T> for Vector<T, N> {
     type Output = Self;
-    #[inline] fn sub(self, other: T) -> Self {
+    #[inline]
+    fn sub(self, other: T) -> Self {
         self.sub_scalar(other)
     }
 }
 
-impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Multiplies each element of the vector by a scalar value.
     ///
     /// # Examples
@@ -601,7 +626,8 @@ impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  Vector<T, N> {
     /// let result = v.mul_scalar(3);
     /// assert_eq!(result.into_inner(), [6, 9, 12]);
     /// ```
-    #[inline] pub fn mul_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn mul_scalar(self, other: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() * other.clone();
@@ -610,14 +636,15 @@ impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  Vector<T, N> {
     }
 }
 
-impl<T: core::ops::Mul<Output=T> + Clone, const N: usize>  core::ops::Mul<T> for Vector<T, N> {
+impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> core::ops::Mul<T> for Vector<T, N> {
     type Output = Self;
-    #[inline] fn mul(self, other: T) -> Self {
+    #[inline]
+    fn mul(self, other: T) -> Self {
         self.mul_scalar(other)
     }
 }
 
-impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::Div<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// Divides each element of the vector by a scalar value.
     ///
     /// # Examples
@@ -629,7 +656,8 @@ impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  Vector<T, N> {
     /// let result = v.div_scalar(3.0);
     /// assert_eq!(result.into_inner(), [2.0, 3.0, 4.0]);
     /// ```
-    #[inline] pub fn div_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn div_scalar(self, other: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             result[i] = result[i].clone() / other.clone();
@@ -638,14 +666,15 @@ impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  Vector<T, N> {
     }
 }
 
-impl<T: core::ops::Div<Output=T> + Clone, const N: usize>  core::ops::Div<T> for Vector<T, N> {
+impl<T: core::ops::Div<Output = T> + Clone, const N: usize> core::ops::Div<T> for Vector<T, N> {
     type Output = Self;
-    #[inline] fn div(self, other: T) -> Self {
+    #[inline]
+    fn div(self, other: T) -> Self {
         self.div_scalar(other)
     }
 }
 
-impl<T: core::ops::AddAssign + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::AddAssign + Clone, const N: usize> Vector<T, N> {
     /// Adds a scalar value to each element in place.
     ///
     /// # Examples
@@ -657,7 +686,8 @@ impl<T: core::ops::AddAssign + Clone, const N: usize>  Vector<T, N> {
     /// v.add_assign_scalar(5);
     /// assert_eq!(v.into_inner(), [6, 7, 8]);
     /// ```
-    #[inline] pub fn add_assign_scalar(&mut self, other: T) {
+    #[inline]
+    pub fn add_assign_scalar(&mut self, other: T) {
         for i in 0..N {
             self.0[i] += other.clone();
         }
@@ -665,13 +695,15 @@ impl<T: core::ops::AddAssign + Clone, const N: usize>  Vector<T, N> {
 }
 
 impl<T: core::ops::AddAssign + Clone, const N: usize> core::ops::AddAssign<T> for Vector<T, N> {
-    #[inline] fn add_assign(&mut self, other: T) {
+    #[inline]
+    fn add_assign(&mut self, other: T) {
         self.add_assign_scalar(other)
     }
 }
 
-impl<T: core::ops::SubAssign + Clone, const N: usize>  Vector<T, N> {
-    #[inline] pub fn sub_assign_scalar(&mut self, other: T) {
+impl<T: core::ops::SubAssign + Clone, const N: usize> Vector<T, N> {
+    #[inline]
+    pub fn sub_assign_scalar(&mut self, other: T) {
         for i in 0..N {
             self.0[i] -= other.clone();
         }
@@ -679,12 +711,13 @@ impl<T: core::ops::SubAssign + Clone, const N: usize>  Vector<T, N> {
 }
 
 impl<T: core::ops::SubAssign + Clone, const N: usize> core::ops::SubAssign<T> for Vector<T, N> {
-    #[inline] fn sub_assign(&mut self, other: T) {
+    #[inline]
+    fn sub_assign(&mut self, other: T) {
         self.sub_assign_scalar(other)
     }
 }
 
-impl <T: core::ops::MulAssign + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::ops::MulAssign + Clone, const N: usize> Vector<T, N> {
     /// Multiplies each element by a scalar value in place.
     ///
     /// # Examples
@@ -696,7 +729,8 @@ impl <T: core::ops::MulAssign + Clone, const N: usize>  Vector<T, N> {
     /// v.mul_assign_scalar(3);
     /// assert_eq!(v.into_inner(), [6, 12, 18]);
     /// ```
-    #[inline] pub fn mul_assign_scalar(&mut self, other: T) {
+    #[inline]
+    pub fn mul_assign_scalar(&mut self, other: T) {
         for i in 0..N {
             self.0[i] *= other.clone();
         }
@@ -704,13 +738,15 @@ impl <T: core::ops::MulAssign + Clone, const N: usize>  Vector<T, N> {
 }
 
 impl<T: core::ops::MulAssign + Clone, const N: usize> core::ops::MulAssign<T> for Vector<T, N> {
-    #[inline] fn mul_assign(&mut self, other: T) {
+    #[inline]
+    fn mul_assign(&mut self, other: T) {
         self.mul_assign_scalar(other)
     }
 }
 
-impl <T: core::ops::DivAssign + Clone, const N: usize>  Vector<T, N> {
-    #[inline] pub fn div_assign_scalar(&mut self, other: T) {
+impl<T: core::ops::DivAssign + Clone, const N: usize> Vector<T, N> {
+    #[inline]
+    pub fn div_assign_scalar(&mut self, other: T) {
         for i in 0..N {
             self.0[i] /= other.clone();
         }
@@ -718,13 +754,16 @@ impl <T: core::ops::DivAssign + Clone, const N: usize>  Vector<T, N> {
 }
 
 impl<T: core::ops::DivAssign + Clone, const N: usize> core::ops::DivAssign<T> for Vector<T, N> {
-    #[inline] fn div_assign(&mut self, other: T) {
+    #[inline]
+    fn div_assign(&mut self, other: T) {
         self.div_assign_scalar(other)
     }
 }
 
 //length squared
-impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: usize>  Vector<T, N> {
+impl<T: core::ops::Mul<Output = T> + Clone + core::ops::Add<Output = T>, const N: usize>
+    Vector<T, N>
+{
     /// Calculates the squared length (magnitude squared) of the vector.
     ///
     /// This is more efficient than `length()` when you only need to compare
@@ -738,7 +777,8 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: u
     /// let v = Vector::new([3.0, 4.0]);
     /// assert_eq!(v.length_squared(), 25.0);
     /// ```
-    #[inline] pub fn length_squared(self) -> T {
+    #[inline]
+    pub fn length_squared(self) -> T {
         let mut result = self.0[0].clone() * self.0[0].clone();
         for i in 1..N {
             result = result + self.0[i].clone() * self.0[i].clone();
@@ -747,7 +787,9 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: u
     }
 }
 
-impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T> + Float, const N: usize> Vector<T,N> {
+impl<T: core::ops::Mul<Output = T> + Clone + core::ops::Add<Output = T> + Float, const N: usize>
+    Vector<T, N>
+{
     /// Calculates the length (magnitude) of the vector.
     ///
     /// # Examples
@@ -758,14 +800,24 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T> + Float, co
     /// let v = Vector::new([3.0, 4.0]);
     /// assert_eq!(v.length(), 5.0);
     /// ```
-    #[inline] pub fn length(self) -> T {
+    #[inline]
+    pub fn length(self) -> T {
         self.length_squared().sqrt()
     }
 }
 
 //euclid_distance_to
 
-impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vector<T, N> {
+impl<
+    T: core::ops::Sub<Output = T>
+        + Clone
+        + Copy
+        + core::ops::Mul<Output = T>
+        + core::ops::Add<Output = T>
+        + Float,
+    const N: usize,
+> Vector<T, N>
+{
     /// Calculates the Euclidean distance between two vectors.
     ///
     /// # Examples
@@ -778,7 +830,8 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
     /// let distance = v1.euclid_distance_to(v2);
     /// assert!((distance - 7.0710678f32).abs() < 0.0001);
     /// ```
-    #[inline] pub fn euclid_distance_to(self, other: Self) -> T {
+    #[inline]
+    pub fn euclid_distance_to(self, other: Self) -> T {
         let mut result = self.0[0] - other.0[0];
         result = result * result;
         for i in 1..N {
@@ -790,7 +843,15 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
 }
 
 //norm
-impl <T: core::ops::Div<Output=T> + Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T> + Float, const N: usize>  Vector<T, N> {
+impl<
+    T: core::ops::Div<Output = T>
+        + Clone
+        + core::ops::Mul<Output = T>
+        + core::ops::Add<Output = T>
+        + Float,
+    const N: usize,
+> Vector<T, N>
+{
     /// Normalizes the vector to unit length.
     ///
     /// Returns a `NormalizedVector` which is guaranteed to have length 1.
@@ -805,19 +866,24 @@ impl <T: core::ops::Div<Output=T> + Clone + core::ops::Mul<Output=T> + core::ops
     /// let length = normalized.as_vector().length();
     /// assert!((length - 1.0f64).abs() < 0.0001);
     /// ```
-    #[inline] pub fn normalize(self) -> NormalizedVector<T,N> {
+    #[inline]
+    pub fn normalize(self) -> NormalizedVector<T, N> {
         NormalizedVector(self.clone() / self.length())
     }
 }
 
-impl<T, const N: usize> Vector<MaybeUninit<T>,N> where T: Sized {
+impl<T, const N: usize> Vector<MaybeUninit<T>, N>
+where
+    T: Sized,
+{
     /// Converts a vector of `MaybeUninit<T>` to `Vector<T>`.
     ///
     /// # Safety
     ///
     /// The caller must ensure all elements have been properly initialized
     /// before calling this method.
-    #[inline] pub unsafe fn assume_init(self) -> Vector<T,N> {
+    #[inline]
+    pub unsafe fn assume_init(self) -> Vector<T, N> {
         let inner = self.0;
         let arr: [T; N] = inner.map(|maybe| unsafe { maybe.assume_init() });
         Vector(arr)
@@ -825,7 +891,13 @@ impl<T, const N: usize> Vector<MaybeUninit<T>,N> where T: Sized {
 }
 
 //cross-product
-impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + core::ops::Add<Output=T>>  Vector<T, 3>
+impl<
+    T: core::ops::Sub<Output = T>
+        + Clone
+        + Copy
+        + core::ops::Mul<Output = T>
+        + core::ops::Add<Output = T>,
+> Vector<T, 3>
 {
     /// Computes the cross product of two 3D vectors.
     ///
@@ -842,14 +914,14 @@ impl <T: core::ops::Sub<Output=T> + Clone + Copy + core::ops::Mul<Output=T> + co
     /// let cross = v1.cross(v2);
     /// assert_eq!(cross.into_inner(), [0, 0, 1]);
     /// ```
-    #[inline] pub fn cross(self, other: Self) -> Self {
+    #[inline]
+    pub fn cross(self, other: Self) -> Self {
         let x = *self.y() * *other.z() - *self.z() * *other.y();
         let y = *self.z() * *other.x() - *self.x() * *other.z();
         let z = *self.x() * *other.y() - *self.y() * *other.x();
-        Vector::new([x,y,z])
+        Vector::new([x, y, z])
     }
 }
-
 
 impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
     /// A vector of uninitialized values.
@@ -865,7 +937,7 @@ impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
 }
 
 //map
-impl <T, const N: usize>  Vector<T, N>
+impl<T, const N: usize> Vector<T, N>
 where
     T: Clone,
 {
@@ -888,9 +960,10 @@ where
     /// let floats = v.map(|x| x as f32);
     /// assert_eq!(floats.into_inner(), [1.0, 2.0, 3.0, 4.0]);
     /// ```
-    #[inline] pub fn map<F,U>(self, mut f: F) -> Vector<U, N>
+    #[inline]
+    pub fn map<F, U>(self, mut f: F) -> Vector<U, N>
     where
-        F: FnMut(T) -> U
+        F: FnMut(T) -> U,
     {
         let mut result = Vector::UNINIT;
 
@@ -902,8 +975,7 @@ where
 }
 
 //map_in_place
-impl <T, const N: usize>  Vector<T, N>
-{
+impl<T, const N: usize> Vector<T, N> {
     /// Applies a function to each element of the vector in place.
     ///
     /// # Arguments
@@ -919,9 +991,10 @@ impl <T, const N: usize>  Vector<T, N>
     /// v.map_in_place(|x| *x *= 2);
     /// assert_eq!(v.into_inner(), [2, 4, 6, 8]);
     /// ```
-    #[inline] pub fn map_in_place<F>(&mut self, mut f: F)
+    #[inline]
+    pub fn map_in_place<F>(&mut self, mut f: F)
     where
-        F: FnMut(&mut T)
+        F: FnMut(&mut T),
     {
         for i in 0..N {
             f(&mut self.0[i]);
@@ -929,10 +1002,8 @@ impl <T, const N: usize>  Vector<T, N>
     }
 }
 
-
-
 //eq_approx
-impl <T: Float + Clone, const N: usize>  Vector<T, N> {
+impl<T: Float + Clone, const N: usize> Vector<T, N> {
     /// Checks if two vectors are approximately equal within a tolerance.
     ///
     /// This is useful for floating-point comparisons where exact equality
@@ -953,9 +1024,13 @@ impl <T: Float + Clone, const N: usize>  Vector<T, N> {
     /// assert!(v1.eq_approx(v2, 0.01));
     /// assert!(!v1.eq_approx(v2, 0.0001));
     /// ```
-    #[inline] pub fn eq_approx(self, other: Self, tolerance: T) -> bool {
+    #[inline]
+    pub fn eq_approx(self, other: Self, tolerance: T) -> bool {
         for i in 0..N {
-            if !self.0[i].clone().eq_approx(other.0[i].clone(), tolerance.clone()) {
+            if !self.0[i]
+                .clone()
+                .eq_approx(other.0[i].clone(), tolerance.clone())
+            {
                 return false;
             }
         }
@@ -964,7 +1039,7 @@ impl <T: Float + Clone, const N: usize>  Vector<T, N> {
 }
 
 //min, max
-impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
+impl<T: core::cmp::PartialOrd + Clone, const N: usize> Vector<T, N> {
     /// Returns the maximum element in the vector.
     ///
     /// # Examples
@@ -975,7 +1050,8 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
     /// let v = Vector::new([3, 1, 4, 1, 5]);
     /// assert_eq!(v.max(), 5);
     /// ```
-    #[inline] pub fn max(self) -> T {
+    #[inline]
+    pub fn max(self) -> T {
         let mut result = self.0[0].clone();
         for i in 1..N {
             if self.0[i].clone() > result {
@@ -995,7 +1071,8 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
     /// let v = Vector::new([3, 1, 4, 1, 5]);
     /// assert_eq!(v.min(), 1);
     /// ```
-    #[inline] pub fn min(self) -> T {
+    #[inline]
+    pub fn min(self) -> T {
         let mut result = self.0[0].clone();
         for i in 1..N {
             if self.0[i].clone() < result {
@@ -1007,7 +1084,8 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N> {
 }
 
 //dot product
-impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
+impl<T: core::ops::Mul<Output = T> + Clone + core::ops::Add<Output = T>, const N: usize>
+    Vector<T, N>
 {
     /// Calculates the dot product (scalar product) of two vectors.
     ///
@@ -1022,7 +1100,8 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: u
     /// let v2 = Vector::new([4, 5, 6]);
     /// assert_eq!(v1.dot(v2), 32); // 1*4 + 2*5 + 3*6
     /// ```
-    #[inline] pub fn dot(self, other: Self) -> T {
+    #[inline]
+    pub fn dot(self, other: Self) -> T {
         let mut result = self.0[0].clone() * other.0[0].clone();
         for i in 1..N {
             result = result + self.0[i].clone() * other.0[i].clone();
@@ -1032,8 +1111,7 @@ impl <T: core::ops::Mul<Output=T> + Clone + core::ops::Add<Output=T>, const N: u
 }
 
 //clamp
-impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
-{
+impl<T: core::cmp::PartialOrd + Clone, const N: usize> Vector<T, N> {
     /// Clamps each element of the vector between minimum and maximum values.
     ///
     /// # Arguments
@@ -1050,13 +1128,13 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
     /// let clamped = v.clamp(2, 12);
     /// assert_eq!(clamped.into_inner(), [2, 5, 10, 12]);
     /// ```
-    #[inline] pub fn clamp(self, min: T, max: T) -> Self {
+    #[inline]
+    pub fn clamp(self, min: T, max: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
             if result[i].clone() < min.clone() {
                 result[i] = min.clone();
-            }
-            else if result[i].clone() > max.clone() {
+            } else if result[i].clone() > max.clone() {
                 result[i] = max.clone();
             }
         }
@@ -1065,7 +1143,15 @@ impl <T: core::cmp::PartialOrd + Clone, const N: usize>  Vector<T, N>
 }
 
 //mix
-impl <T: Float + Constants + Clone + core::ops::Sub<Output=T> + core::ops::Mul<Output=T> + core::ops::Add<Output=T>, const N: usize>  Vector<T, N>
+impl<
+    T: Float
+        + Constants
+        + Clone
+        + core::ops::Sub<Output = T>
+        + core::ops::Mul<Output = T>
+        + core::ops::Add<Output = T>,
+    const N: usize,
+> Vector<T, N>
 {
     /// Performs linear interpolation between two vectors.
     ///
@@ -1084,34 +1170,38 @@ impl <T: Float + Constants + Clone + core::ops::Sub<Output=T> + core::ops::Mul<O
     /// let interpolated = v1.mix(v2, 0.5);
     /// assert_eq!(interpolated.into_inner(), [5.0, 5.0, 5.0]);
     /// ```
-    #[inline] pub fn mix(self, other: Self, weight: T) -> Self {
+    #[inline]
+    pub fn mix(self, other: Self, weight: T) -> Self {
         let mut result = self.0.clone();
         for i in 0..N {
-            result[i] = self.0[i].clone() * (T::ONE - weight.clone()) + other.0[i].clone() * weight.clone();
+            result[i] =
+                self.0[i].clone() * (T::ONE - weight.clone()) + other.0[i].clone() * weight.clone();
         }
         Self(result)
     }
 }
 
 //index
-impl <T, const N: usize>  core::ops::Index<usize> for Vector<T, N>
-{
+impl<T, const N: usize> core::ops::Index<usize> for Vector<T, N> {
     type Output = T;
-    #[inline] fn index(&self, index: usize) -> &Self::Output {
+    #[inline]
+    fn index(&self, index: usize) -> &Self::Output {
         &self.0[index]
     }
 }
 
 //index_mut
-impl <T, const N: usize>  core::ops::IndexMut<usize> for Vector<T, N>
-{
-    #[inline] fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+impl<T, const N: usize> core::ops::IndexMut<usize> for Vector<T, N> {
+    #[inline]
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.0[index]
     }
 }
 
 //to_row, to_col
-impl <T, const N: usize>  Vector<T, N> where T: Clone
+impl<T, const N: usize> Vector<T, N>
+where
+    T: Clone,
 {
     /// Converts the vector to a row matrix (1×N matrix).
     ///
@@ -1124,7 +1214,8 @@ impl <T, const N: usize>  Vector<T, N> where T: Clone
     /// let row_matrix = v.to_row();
     /// // Creates a 1×3 matrix
     /// ```
-    #[inline] pub fn to_row(self) -> Matrix<T, 1, N> {
+    #[inline]
+    pub fn to_row(self) -> Matrix<T, 1, N> {
         Matrix::new_rows([self])
     }
 
@@ -1140,7 +1231,8 @@ impl <T, const N: usize>  Vector<T, N> where T: Clone
     /// let v = Vector::from_row(row);
     /// assert_eq!(v.into_inner(), [1, 2, 3]);
     /// ```
-    #[inline] pub fn from_row(row: Matrix<T, 1, N>) -> Self {
+    #[inline]
+    pub fn from_row(row: Matrix<T, 1, N>) -> Self {
         row.rows()[0].clone()
     }
 
@@ -1156,7 +1248,8 @@ impl <T, const N: usize>  Vector<T, N> where T: Clone
     /// let v = Vector::from_col(col);
     /// assert_eq!(v.into_inner(), [1, 2, 3]);
     /// ```
-    #[inline] pub fn from_col(col: Matrix<T, N, 1>) -> Self {
+    #[inline]
+    pub fn from_col(col: Matrix<T, N, 1>) -> Self {
         col.columns()[0].clone()
     }
 
@@ -1171,52 +1264,55 @@ impl <T, const N: usize>  Vector<T, N> where T: Clone
     /// let col_matrix = v.to_col();
     /// // Creates a 3×1 matrix
     /// ```
-    #[inline] pub fn to_col(self) -> Matrix<T, N, 1> {
+    #[inline]
+    pub fn to_col(self) -> Matrix<T, N, 1> {
         Matrix::new_columns([self])
     }
 }
 
 //boilerplate
 
-impl<T, const N: usize> Default for Vector<T, N> where T: Default + Copy {
+impl<T, const N: usize> Default for Vector<T, N>
+where
+    T: Default + Copy,
+{
     fn default() -> Self {
         Vector::new([T::default(); N])
     }
 }
 
 //boilerplate: tuple constructors
-impl<T> From<T> for Vector<T,1> {
+impl<T> From<T> for Vector<T, 1> {
     fn from(value: T) -> Self {
         Vector::new([value])
     }
 }
 
-impl<T> From<(T,)> for Vector<T,1> {
+impl<T> From<(T,)> for Vector<T, 1> {
     fn from(value: (T,)) -> Self {
         Vector::new([value.0])
     }
 }
 
-impl<T> From<(T,T)> for Vector<T,2> {
-    fn from(value: (T,T)) -> Self {
+impl<T> From<(T, T)> for Vector<T, 2> {
+    fn from(value: (T, T)) -> Self {
         Vector::new([value.0, value.1])
     }
 }
 
-impl<T> From<(T,T,T)> for Vector<T,3> {
-    fn from(value: (T,T,T)) -> Self {
+impl<T> From<(T, T, T)> for Vector<T, 3> {
+    fn from(value: (T, T, T)) -> Self {
         Vector::new([value.0, value.1, value.2])
     }
 }
 
-impl<T> From<(T,T,T,T)> for Vector<T,4> {
-    fn from(value: (T,T,T,T)) -> Self {
+impl<T> From<(T, T, T, T)> for Vector<T, 4> {
+    fn from(value: (T, T, T, T)) -> Self {
         Vector::new([value.0, value.1, value.2, value.3])
     }
 }
 
-
-impl<T> From<Vector<T,1>> for (T,) {
+impl<T> From<Vector<T, 1>> for (T,) {
     fn from(value: Vector<T, 1>) -> Self {
         let a = value.0;
         let mut iter = a.into_iter();
@@ -1224,7 +1320,7 @@ impl<T> From<Vector<T,1>> for (T,) {
     }
 }
 
-impl<T> From<Vector<T, 2>> for (T,T) {
+impl<T> From<Vector<T, 2>> for (T, T) {
     fn from(value: Vector<T, 2>) -> Self {
         let a = value.0;
         let mut iter = a.into_iter();
@@ -1232,29 +1328,38 @@ impl<T> From<Vector<T, 2>> for (T,T) {
     }
 }
 
-impl<T> From<Vector<T, 3>> for (T,T,T) {
+impl<T> From<Vector<T, 3>> for (T, T, T) {
     fn from(value: Vector<T, 3>) -> Self {
         let a = value.0;
         let mut iter = a.into_iter();
-        (iter.next().unwrap(), iter.next().unwrap(), iter.next().unwrap())
+        (
+            iter.next().unwrap(),
+            iter.next().unwrap(),
+            iter.next().unwrap(),
+        )
     }
 }
 
-impl<T> From<Vector<T, 4>> for (T,T,T,T) {
+impl<T> From<Vector<T, 4>> for (T, T, T, T) {
     fn from(value: Vector<T, 4>) -> Self {
         let a = value.0;
         let mut iter = a.into_iter();
-        (iter.next().unwrap(), iter.next().unwrap(), iter.next().unwrap(), iter.next().unwrap())
+        (
+            iter.next().unwrap(),
+            iter.next().unwrap(),
+            iter.next().unwrap(),
+            iter.next().unwrap(),
+        )
     }
 }
 
-impl<T, const N: usize> From<Vector<T,N>> for [T; N] {
+impl<T, const N: usize> From<Vector<T, N>> for [T; N] {
     fn from(value: Vector<T, N>) -> Self {
         value.0
     }
 }
 
-impl<T, const N: usize> From<[T; N]> for Vector<T,N> {
+impl<T, const N: usize> From<[T; N]> for Vector<T, N> {
     fn from(value: [T; N]) -> Self {
         Vector::new(value)
     }
@@ -1262,31 +1367,40 @@ impl<T, const N: usize> From<[T; N]> for Vector<T,N> {
 
 //asref/asmut
 
-impl<T, const N: usize> core::convert::AsRef<[T; N]> for Vector<T,N> {
+impl<T, const N: usize> core::convert::AsRef<[T; N]> for Vector<T, N> {
     fn as_ref(&self) -> &[T; N] {
         &self.0
     }
 }
 
-impl<T, const N: usize> core::convert::AsMut<[T; N]> for Vector<T,N> {
+impl<T, const N: usize> core::convert::AsMut<[T; N]> for Vector<T, N> {
     fn as_mut(&mut self) -> &mut [T; N] {
         &mut self.0
     }
 }
 
-impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vector<T,M> where T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T> {
-    type Output = Matrix<T,1,N>;
+impl<T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vector<T, M>
+where
+    T: Clone + core::ops::Mul<Output = T> + core::ops::Add<Output = T>,
+{
+    type Output = Matrix<T, 1, N>;
 
-    fn mul(self, rhs: Matrix<T, M,N>) -> Self::Output {
+    fn mul(self, rhs: Matrix<T, M, N>) -> Self::Output {
         self.to_row().mul_matrix(rhs)
     }
 }
 
-
 //NormalizedVector boilerplate
 
 // From/Into implementations
-impl<T, const N: usize> From<Vector<T, N>> for NormalizedVector<T, N> where T: core::ops::Add<Output=T> + Clone + core::ops::Div<Output=T> + core::ops::Mul<Output=T> + Float {
+impl<T, const N: usize> From<Vector<T, N>> for NormalizedVector<T, N>
+where
+    T: core::ops::Add<Output = T>
+        + Clone
+        + core::ops::Div<Output = T>
+        + core::ops::Mul<Output = T>
+        + Float,
+{
     ///Converts to NormalizedVector by normalizing the vector.
     fn from(value: Vector<T, N>) -> Self {
         value.normalize()
@@ -1311,156 +1425,165 @@ impl<T, const N: usize> AsRef<Vector<T, N>> for NormalizedVector<T, N> {
 // Deref for convenient access to Vector methods (no DerefMut to preserve normalization)
 impl<T, const N: usize> core::ops::Deref for NormalizedVector<T, N> {
     type Target = Vector<T, N>;
-    
+
     fn deref(&self) -> &Self::Target {
         self.as_vector()
     }
 }
 
-
-
-
-
-#[cfg(test)] mod tests {
+#[cfg(test)]
+mod tests {
     use crate::vector::Vector;
 
-    #[test] fn elementwise() {
-        let a = Vector::new([1,2,3]);
-        let b = Vector::new([4,5,6]);
+    #[test]
+    fn elementwise() {
+        let a = Vector::new([1, 2, 3]);
+        let b = Vector::new([4, 5, 6]);
         let c = a + b;
-        assert_eq!(c.0, [5,7,9]);
+        assert_eq!(c.0, [5, 7, 9]);
 
         let d = a - b;
-        assert_eq!(d.0, [-3,-3,-3]);
+        assert_eq!(d.0, [-3, -3, -3]);
 
         let e = a * b;
-        assert_eq!(e.0, [4,10,18]);
+        assert_eq!(e.0, [4, 10, 18]);
 
         let f = a / b;
-        assert_eq!(f.0, [0,0,0]);
+        assert_eq!(f.0, [0, 0, 0]);
     }
 
-    #[test] fn elementwise_assign() {
-        let mut a = Vector::new([1,2,3]);
-        let b = Vector::new([4,5,6]);
+    #[test]
+    fn elementwise_assign() {
+        let mut a = Vector::new([1, 2, 3]);
+        let b = Vector::new([4, 5, 6]);
         a += b;
-        assert_eq!(a.0, [5,7,9]);
+        assert_eq!(a.0, [5, 7, 9]);
 
-        let mut c = Vector::new([1,2,3]);
-        let d = Vector::new([4,5,6]);
+        let mut c = Vector::new([1, 2, 3]);
+        let d = Vector::new([4, 5, 6]);
         c -= d;
-        assert_eq!(c.0, [-3,-3,-3]);
+        assert_eq!(c.0, [-3, -3, -3]);
 
-        let mut e = Vector::new([1,2,3]);
-        let f = Vector::new([4,5,6]);
+        let mut e = Vector::new([1, 2, 3]);
+        let f = Vector::new([4, 5, 6]);
         e *= f;
-        assert_eq!(e.0, [4,10,18]);
+        assert_eq!(e.0, [4, 10, 18]);
 
-        let mut g = Vector::new([1,2,3]);
-        let h = Vector::new([4,5,6]);
+        let mut g = Vector::new([1, 2, 3]);
+        let h = Vector::new([4, 5, 6]);
         g /= h;
-        assert_eq!(g.0, [0,0,0]);
+        assert_eq!(g.0, [0, 0, 0]);
     }
 
-    #[test] fn scalar() {
-        let a = Vector::new([1,2,3]);
+    #[test]
+    fn scalar() {
+        let a = Vector::new([1, 2, 3]);
         let b = a + 1;
-        assert_eq!(b.0, [2,3,4]);
+        assert_eq!(b.0, [2, 3, 4]);
 
         let c = a - 1;
-        assert_eq!(c.0, [0,1,2]);
+        assert_eq!(c.0, [0, 1, 2]);
 
         let d = a * 2;
-        assert_eq!(d.0, [2,4,6]);
+        assert_eq!(d.0, [2, 4, 6]);
 
         let e = a / 2;
-        assert_eq!(e.0, [0,1,1]);
+        assert_eq!(e.0, [0, 1, 1]);
     }
 
-    #[test] fn scalar_assign() {
-        let mut a = Vector::new([1,2,3]);
+    #[test]
+    fn scalar_assign() {
+        let mut a = Vector::new([1, 2, 3]);
         a += 1;
-        assert_eq!(a.0, [2,3,4]);
+        assert_eq!(a.0, [2, 3, 4]);
 
-        let mut b = Vector::new([1,2,3]);
+        let mut b = Vector::new([1, 2, 3]);
         b -= 1;
-        assert_eq!(b.0, [0,1,2]);
+        assert_eq!(b.0, [0, 1, 2]);
 
-        let mut c = Vector::new([1,2,3]);
+        let mut c = Vector::new([1, 2, 3]);
         c *= 2;
-        assert_eq!(c.0, [2,4,6]);
+        assert_eq!(c.0, [2, 4, 6]);
 
-        let mut d = Vector::new([1,2,3]);
+        let mut d = Vector::new([1, 2, 3]);
         d /= 2;
-        assert_eq!(d.0, [0,1,1]);
+        assert_eq!(d.0, [0, 1, 1]);
     }
 
-    #[test] fn length() {
-        let a = Vector::new([3.0,4.0]);
+    #[test]
+    fn length() {
+        let a = Vector::new([3.0, 4.0]);
         assert_eq!(a.length(), 5.0);
     }
 
-    #[test] fn euclid_distance() {
-        let a = Vector::new([1.0,2.0]);
-        let b = Vector::new([4.0,6.0]);
+    #[test]
+    fn euclid_distance() {
+        let a = Vector::new([1.0, 2.0]);
+        let b = Vector::new([4.0, 6.0]);
         assert_eq!(a.euclid_distance_to(b), 5.0);
     }
 
-    #[test] fn normalize() {
-        let a = Vector::new([3.0,4.0]);
+    #[test]
+    fn normalize() {
+        let a = Vector::new([3.0, 4.0]);
         let b = a.normalize();
         assert_eq!(b.as_vector().length(), 1.0);
     }
 
-    #[test] fn map() {
-        let a = Vector::new([1i32,-2,3]);
+    #[test]
+    fn map() {
+        let a = Vector::new([1i32, -2, 3]);
         let b = a.map(|x| x.abs());
-        assert_eq!(b.0, [1,2,3]);
+        assert_eq!(b.0, [1, 2, 3]);
     }
 
-    #[test] fn min_max() {
-        let a = Vector::new([1,2,3]);
+    #[test]
+    fn min_max() {
+        let a = Vector::new([1, 2, 3]);
         assert_eq!(a.min(), 1);
         assert_eq!(a.max(), 3);
     }
 
-    #[test] fn eq_approx() {
-        let a = Vector::new([1.0,2.0,3.0]);
-        let b = Vector::new([1.0,2.005,3.0]);
+    #[test]
+    fn eq_approx() {
+        let a = Vector::new([1.0, 2.0, 3.0]);
+        let b = Vector::new([1.0, 2.005, 3.0]);
         assert!(a.eq_approx(b, 0.01));
         assert!(!a.eq_approx(b, 0.001));
-
     }
-    #[test] fn test_cross() {
-        let a = Vector::new([1,2,3]);
-        let b = Vector::new([4,5,6]);
+    #[test]
+    fn test_cross() {
+        let a = Vector::new([1, 2, 3]);
+        let b = Vector::new([4, 5, 6]);
         let c = a.cross(b);
-        assert_eq!(c.0, [-3,6,-3]);
+        assert_eq!(c.0, [-3, 6, -3]);
     }
 
-    #[test] fn test_dot() {
-        let a = Vector::new([1,2,3]);
-        let b = Vector::new([4,5,6]);
+    #[test]
+    fn test_dot() {
+        let a = Vector::new([1, 2, 3]);
+        let b = Vector::new([4, 5, 6]);
         let c = a.dot(b);
         assert_eq!(c, 32);
     }
 
-    #[test] fn test_clamp() {
-        let a = Vector::new([1,2,3,4]);
+    #[test]
+    fn test_clamp() {
+        let a = Vector::new([1, 2, 3, 4]);
         let b = a.clamp(2, 3);
-        assert_eq!(b.0, [2,2,3,3]);
+        assert_eq!(b.0, [2, 2, 3, 3]);
     }
 
-    #[test] fn test_mix() {
-        let a = Vector::new([1.0f32,2.0,3.0,4.0]);
-        let b = a.mix(Vector::new([4.0f32,3.0,2.0,1.0]), 0.5);
-        assert_eq!(b.0, [2.5,2.5,2.5,2.5]);
+    #[test]
+    fn test_mix() {
+        let a = Vector::new([1.0f32, 2.0, 3.0, 4.0]);
+        let b = a.mix(Vector::new([4.0f32, 3.0, 2.0, 1.0]), 0.5);
+        assert_eq!(b.0, [2.5, 2.5, 2.5, 2.5]);
     }
 
-    #[test] fn test_convert() {
-        let a = Vector::new([1,2,3]);
+    #[test]
+    fn test_convert() {
+        let a = Vector::new([1, 2, 3]);
         let _b: (i32, i32, i32) = a.into();
     }
-
-
 }

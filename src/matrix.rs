@@ -45,19 +45,19 @@
 //!
 //! # Storage Layout
 //!
-//! Matrices use column-major storage internally. This means that columns are 
+//! Matrices use column-major storage internally. This means that columns are
 //! contiguous in memory, which is optimal for many linear algebra operations.
 //! Despite column-major storage, both row and column accessors are provided
 //! for convenience.
 
+mod m2x2;
 mod m3x3;
 mod m4x4;
-mod m2x2;
 
+use crate::types::sealed::Constants;
+use crate::vector::Vector;
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
-use crate::types::sealed::{Constants};
-use crate::vector::Vector;
 
 /// A mathematical matrix with `R` rows and `C` columns.
 ///
@@ -99,13 +99,12 @@ use crate::vector::Vector;
 /// assert_eq!(*identity.element_at(1, 1), 1.0);
 /// assert_eq!(*identity.element_at(0, 1), 0.0);
 /// ```
-#[derive(Copy,Clone,PartialEq,Eq,PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Matrix<T, const R: usize, const C: usize> {
-    columns: [Vector<T,R>; C],
+    columns: [Vector<T, R>; C],
 }
 
-impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
-
+impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
     /// An uninitialized matrix with uninitialized elements.
     ///
     /// This is useful for creating matrices that will be filled in later,
@@ -115,7 +114,7 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     ///
     /// The returned matrix contains uninitialized memory. You must initialize
     /// all elements before calling `assume_init()`.
-    pub const UNINIT: Matrix<MaybeUninit<T>,R,C> = Matrix {
+    pub const UNINIT: Matrix<MaybeUninit<T>, R, C> = Matrix {
         columns: [Vector::UNINIT; C],
     };
 
@@ -144,10 +143,9 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// // | 1.0  2.0  3.0 |
     /// // | 4.0  5.0  6.0 |
     /// ```
-    #[inline] pub const fn new_columns(columns: [Vector<T, R>; C]) -> Self {
-        Self {
-            columns,
-        }
+    #[inline]
+    pub const fn new_columns(columns: [Vector<T, R>; C]) -> Self {
+        Self { columns }
     }
 
     /// Creates a new matrix from the given rows.
@@ -175,9 +173,10 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// // | 1.0  2.0  3.0 |
     /// // | 4.0  5.0  6.0 |
     /// ```
-    #[inline] pub fn new_rows(rows: [Vector<T, C>; R]) -> Self
+    #[inline]
+    pub fn new_rows(rows: [Vector<T, C>; R]) -> Self
     where
-        T: Clone
+        T: Clone,
     {
         Matrix::new_columns(rows).transpose()
     }
@@ -213,9 +212,10 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// assert_eq!(*m.element_at(0, 0), 1.0);
     /// assert_eq!(*m.element_at(1, 2), 6.0);
     /// ```
-    #[inline] pub fn new_from_array<const L: usize>(arr: [T; L]) -> Self
+    #[inline]
+    pub fn new_from_array<const L: usize>(arr: [T; L]) -> Self
     where
-        T: Clone
+        T: Clone,
     {
         assert_eq!(L, R * C);
         let mut columns = [const { MaybeUninit::uninit() }; C];
@@ -228,9 +228,7 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
             columns[c] = MaybeUninit::new(column);
         }
         let arr: [Vector<T, R>; C] = columns.map(|maybe| unsafe { maybe.assume_init() });
-        Self {
-            columns: arr,
-        }
+        Self { columns: arr }
     }
 
     /// Returns the transpose of this matrix.
@@ -267,7 +265,7 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// ```
     pub fn transpose(self) -> Matrix<T, C, R>
     where
-        T: Clone
+        T: Clone,
     {
         let mut columns = [const { MaybeUninit::uninit() }; R];
         for r in 0..R {
@@ -279,16 +277,12 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
             columns[r] = MaybeUninit::new(column);
         }
         let arr: [Vector<T, C>; R] = columns.map(|maybe| unsafe { maybe.assume_init() });
-        Matrix {
-            columns: arr,
-        }
+        Matrix { columns: arr }
     }
-
-
 }
 
 //assume_init
-impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>,R,C> {
+impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>, R, C> {
     /// Assumes that all elements in the matrix have been initialized.
     ///
     /// # Safety
@@ -319,16 +313,16 @@ impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>,R,C> {
     /// assert_eq!(*initialized.element_at(0, 0), 0.0);
     /// assert_eq!(*initialized.element_at(1, 1), 3.0);
     /// ```
-    pub unsafe fn assume_init(self) -> Matrix<T,R,C> {
+    pub unsafe fn assume_init(self) -> Matrix<T, R, C> {
         let columns = self.columns.map(|maybe| unsafe { maybe.assume_init() });
-        Matrix {
-            columns
-        }
+        Matrix { columns }
     }
 }
 
 //elementwise add
-impl<T: Constants + Clone + core::ops::Add<Output=T> , const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Constants + Clone + core::ops::Add<Output = T>, const R: usize, const C: usize>
+    Matrix<T, R, C>
+{
     /// Performs element-wise addition with another matrix.
     ///
     /// Each element in the result is the sum of the corresponding elements
@@ -361,26 +355,34 @@ impl<T: Constants + Clone + core::ops::Add<Output=T> , const R: usize, const C: 
     /// assert_eq!(*result.element_at(0, 0), 6.0);
     /// assert_eq!(*result.element_at(1, 1), 12.0);
     /// ```
-    #[inline] pub fn elementwise_add(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_add(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_add(other.columns[c].clone()));
+            columns[c] = MaybeUninit::new(
+                self.columns[c]
+                    .clone()
+                    .elementwise_add(other.columns[c].clone()),
+            );
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-impl<T: Constants + Clone + core::ops::Add<Output=T>, const R: usize, const C: usize> core::ops::Add for Matrix<T,R,C> {
+impl<T: Constants + Clone + core::ops::Add<Output = T>, const R: usize, const C: usize>
+    core::ops::Add for Matrix<T, R, C>
+{
     type Output = Self;
-    #[inline] fn add(self, other: Self) -> Self {
+    #[inline]
+    fn add(self, other: Self) -> Self {
         self.elementwise_add(other)
     }
 }
 
-impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Constants + Clone + core::ops::Sub<Output = T>, const R: usize, const C: usize>
+    Matrix<T, R, C>
+{
     /// Performs element-wise subtraction with another matrix.
     ///
     /// Each element in the result is the difference of the corresponding elements
@@ -405,43 +407,55 @@ impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: 
     /// assert_eq!(*result.element_at(0, 0), 9.0);
     /// assert_eq!(*result.element_at(1, 1), 36.0);
     /// ```
-    #[inline] pub fn elementwise_sub(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_sub(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_sub(other.columns[c].clone()));
+            columns[c] = MaybeUninit::new(
+                self.columns[c]
+                    .clone()
+                    .elementwise_sub(other.columns[c].clone()),
+            );
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-impl<T: Constants + Clone + core::ops::Sub<Output=T> , const R: usize, const C: usize> core::ops::Sub for  Matrix<T,R,C> {
+impl<T: Constants + Clone + core::ops::Sub<Output = T>, const R: usize, const C: usize>
+    core::ops::Sub for Matrix<T, R, C>
+{
     type Output = Self;
-    #[inline] fn sub(self, other: Self) -> Self {
+    #[inline]
+    fn sub(self, other: Self) -> Self {
         self.elementwise_sub(other)
     }
 }
 
-impl<T: Constants + Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Constants + Clone + core::ops::Mul<Output = T>, const R: usize, const C: usize>
+    Matrix<T, R, C>
+{
     ///Multiply all elements in the matrix by the corresponding elements in the other matrix.
     ///
     /// This has no Mul implementation -> in Rust that would conflict with matrix multiply.
-    #[inline] pub fn elementwise_mul(self, other: Self) -> Self {
+    #[inline]
+    pub fn elementwise_mul(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_mul(other.columns[c].clone()));
+            columns[c] = MaybeUninit::new(
+                self.columns[c]
+                    .clone()
+                    .elementwise_mul(other.columns[c].clone()),
+            );
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-
-impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Constants + Clone + core::ops::Div<Output = T>, const R: usize, const C: usize>
+    Matrix<T, R, C>
+{
     /**
     Divide all elements in the matrix by the corresponding elements in the other matrix.
 
@@ -451,18 +465,19 @@ impl <T: Constants + Clone + core::ops::Div<Output=T>, const R: usize, const C: 
     pub fn elementwise_div(self, other: Self) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
-            columns[c] = MaybeUninit::new(self.columns[c].clone().elementwise_div(other.columns[c].clone()));
+            columns[c] = MaybeUninit::new(
+                self.columns[c]
+                    .clone()
+                    .elementwise_div(other.columns[c].clone()),
+            );
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-
 //constants
-impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Constants, const R: usize, const C: usize> Matrix<T, R, C> {
     /// A matrix where all elements are zero.
     ///
     /// # Examples
@@ -482,7 +497,7 @@ impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
     pub const ZERO: Self = Self {
         columns: [Vector::ZERO; C],
     };
-    
+
     /// A matrix where all elements are one.
     ///
     /// Note: This is different from an identity matrix. For identity matrices,
@@ -508,165 +523,217 @@ impl <T: Constants, const R: usize, const C: usize> Matrix<T,R,C> {
 }
 
 //identities
-impl <T: Constants> Matrix<T,1,1> {
+impl<T: Constants> Matrix<T, 1, 1> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::ONE],
     };
 }
 
-impl <T: Constants> Matrix<T,1,2> {
+impl<T: Constants> Matrix<T, 1, 2> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::ONE, Vector::ZERO],
     };
 }
 
-impl<T: Constants> Matrix<T,1,3> {
+impl<T: Constants> Matrix<T, 1, 3> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::ONE, Vector::ZERO, Vector::ZERO],
     };
 }
 
-impl <T: Constants> Matrix<T,1,4> {
+impl<T: Constants> Matrix<T, 1, 4> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::ONE, Vector::ZERO, Vector::ZERO, Vector::ZERO],
     };
 }
 
-impl<T: Constants> Matrix<T,2,1> {
+impl<T: Constants> Matrix<T, 2, 1> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::new([T::ONE, T::ZERO])],
     };
 }
 
-impl<T: Constants> Matrix<T,2,2> {
+impl<T: Constants> Matrix<T, 2, 2> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ONE])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE]),
+        ],
     };
 }
 
-impl<T: Constants> Matrix<T,2,3> {
+impl<T: Constants> Matrix<T, 2, 3> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ONE]), Vector::new([T::ZERO, T::ZERO])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE]),
+            Vector::new([T::ZERO, T::ZERO]),
+        ],
     };
 }
 
-impl<T: Constants> Matrix<T,2,4> {
+impl<T: Constants> Matrix<T, 2, 4> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ONE]), Vector::new([T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ZERO])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE]),
+            Vector::new([T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ZERO]),
+        ],
     };
 }
 
-impl <T: Constants> Matrix<T,3,1> {
+impl<T: Constants> Matrix<T, 3, 1> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::new([T::ONE, T::ZERO, T::ZERO])],
     };
 }
 
-impl <T: Constants> Matrix<T,3,2> {
+impl<T: Constants> Matrix<T, 3, 2> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE, T::ZERO]),
+        ],
     };
 }
 
-impl <T: Constants> Matrix<T,3,3> {
+impl<T: Constants> Matrix<T, 3, 3> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE, T::ZERO]),
+            Vector::new([T::ZERO, T::ZERO, T::ONE]),
+        ],
     };
 }
 
-impl <T: Constants> Matrix<T,3,4> {
+impl<T: Constants> Matrix<T, 3, 4> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE]), Vector::new([T::ZERO, T::ZERO, T::ZERO])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE, T::ZERO]),
+            Vector::new([T::ZERO, T::ZERO, T::ONE]),
+            Vector::new([T::ZERO, T::ZERO, T::ZERO]),
+        ],
     };
 }
 
-impl<T: Constants> Matrix<T,4,1> {
+impl<T: Constants> Matrix<T, 4, 1> {
     pub const IDENTITY: Self = Self {
         columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO])],
     };
 }
 
-impl<T: Constants> Matrix<T,4,2> {
+impl<T: Constants> Matrix<T, 4, 2> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]),
+        ],
     };
 }
 
-impl<T: Constants> Matrix<T,4,3> {
+impl<T: Constants> Matrix<T, 4, 3> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE, T::ZERO])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ZERO, T::ONE, T::ZERO]),
+        ],
     };
 }
 
-impl<T: Constants> Matrix<T,4,4> {
+impl<T: Constants> Matrix<T, 4, 4> {
     pub const IDENTITY: Self = Self {
-        columns: [Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ONE, T::ZERO]), Vector::new([T::ZERO, T::ZERO, T::ZERO, T::ONE])],
+        columns: [
+            Vector::new([T::ONE, T::ZERO, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ONE, T::ZERO, T::ZERO]),
+            Vector::new([T::ZERO, T::ZERO, T::ONE, T::ZERO]),
+            Vector::new([T::ZERO, T::ZERO, T::ZERO, T::ONE]),
+        ],
     };
 }
 
 //AddAssign, etc.
-impl <T: Clone + core::ops::AddAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    #[inline] pub fn add_elementwise_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::AddAssign, const R: usize, const C: usize> Matrix<T, R, C> {
+    #[inline]
+    pub fn add_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] += other.columns[c].clone();
         }
     }
 }
 
-impl <T: Clone + core::ops::AddAssign, const R: usize, const C: usize> core::ops::AddAssign for Matrix<T,R,C> {
-    #[inline] fn add_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::AddAssign, const R: usize, const C: usize> core::ops::AddAssign
+    for Matrix<T, R, C>
+{
+    #[inline]
+    fn add_assign(&mut self, other: Self) {
         self.add_elementwise_assign(other);
     }
 }
 
 //SubAssign
-impl <T: Clone + core::ops::SubAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    #[inline] pub fn sub_elementwise_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::SubAssign, const R: usize, const C: usize> Matrix<T, R, C> {
+    #[inline]
+    pub fn sub_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] -= other.columns[c].clone();
         }
     }
 }
-impl <T: Clone + core::ops::SubAssign, const R: usize, const C: usize> core::ops::SubAssign for Matrix<T,R,C> {
-    #[inline] fn sub_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::SubAssign, const R: usize, const C: usize> core::ops::SubAssign
+    for Matrix<T, R, C>
+{
+    #[inline]
+    fn sub_assign(&mut self, other: Self) {
         self.sub_elementwise_assign(other);
     }
 }
 
 //MulAssign
-impl <T: Clone + core::ops::MulAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    #[inline] pub fn mul_elementwise_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::MulAssign, const R: usize, const C: usize> Matrix<T, R, C> {
+    #[inline]
+    pub fn mul_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] *= other.columns[c].clone();
         }
     }
 }
 
-impl <T: Clone + core::ops::MulAssign, const R: usize, const C: usize> core::ops::MulAssign for Matrix<T,R,C> {
-    #[inline] fn mul_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::MulAssign, const R: usize, const C: usize> core::ops::MulAssign
+    for Matrix<T, R, C>
+{
+    #[inline]
+    fn mul_assign(&mut self, other: Self) {
         self.mul_elementwise_assign(other);
     }
 }
 
 //DivAssign
 
-impl <T: Clone + core::ops::DivAssign, const R: usize, const C: usize> Matrix<T,R,C> {
-    #[inline] pub fn div_elementwise_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::DivAssign, const R: usize, const C: usize> Matrix<T, R, C> {
+    #[inline]
+    pub fn div_elementwise_assign(&mut self, other: Self) {
         for c in 0..C {
             self.columns[c] /= other.columns[c].clone();
         }
     }
 }
 
-impl <T: Clone + core::ops::DivAssign, const R: usize, const C: usize> core::ops::DivAssign for Matrix<T,R,C> {
-    #[inline] fn div_assign(&mut self, other: Self) {
+impl<T: Clone + core::ops::DivAssign, const R: usize, const C: usize> core::ops::DivAssign
+    for Matrix<T, R, C>
+{
+    #[inline]
+    fn div_assign(&mut self, other: Self) {
         self.div_elementwise_assign(other);
     }
 }
 
 //scalar ops
 
-impl<T: Clone + core::ops::Add<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Clone + core::ops::Add<Output = T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Adds a scalar value to each element in the matrix.
     ///
     /// # Examples
@@ -684,19 +751,18 @@ impl<T: Clone + core::ops::Add<Output=T>, const R: usize, const C: usize> Matrix
     /// assert_eq!(*result.element_at(0, 0), 11.0);
     /// assert_eq!(*result.element_at(1, 1), 14.0);
     /// ```
-    #[inline] pub fn add_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn add_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().add_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-impl<T: Clone + core::ops::Sub<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Clone + core::ops::Sub<Output = T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Subtracts a scalar value from each element in the matrix.
     ///
     /// # Examples
@@ -714,19 +780,18 @@ impl<T: Clone + core::ops::Sub<Output=T>, const R: usize, const C: usize> Matrix
     /// assert_eq!(*result.element_at(0, 0), 5.0);
     /// assert_eq!(*result.element_at(1, 1), 35.0);
     /// ```
-    #[inline] pub fn sub_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn sub_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().sub_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-impl<T: Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Clone + core::ops::Mul<Output = T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Multiplies each element in the matrix by a scalar value.
     ///
     /// # Examples
@@ -744,19 +809,18 @@ impl<T: Clone + core::ops::Mul<Output=T>, const R: usize, const C: usize> Matrix
     /// assert_eq!(*result.element_at(0, 0), 3.0);
     /// assert_eq!(*result.element_at(1, 1), 12.0);
     /// ```
-    #[inline] pub fn mul_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn mul_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().mul_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
-impl<T: Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Clone + core::ops::Div<Output = T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Divides each element in the matrix by a scalar value.
     ///
     /// # Examples
@@ -774,94 +838,100 @@ impl<T: Clone + core::ops::Div<Output=T>, const R: usize, const C: usize> Matrix
     /// assert_eq!(*result.element_at(0, 0), 1.0);
     /// assert_eq!(*result.element_at(1, 1), 4.0);
     /// ```
-    #[inline] pub fn div_scalar(self, other: T) -> Self {
+    #[inline]
+    pub fn div_scalar(self, other: T) -> Self {
         let mut columns = [const { MaybeUninit::uninit() }; C];
         for c in 0..C {
             columns[c] = MaybeUninit::new(self.columns[c].clone().div_scalar(other.clone()));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
 //trait implementations
-impl <T, const R: usize, const C: usize> core::ops::Add<T> for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> core::ops::Add<T> for Matrix<T, R, C>
 where
-    T: core::ops::Add<Output=T> + Clone,
+    T: core::ops::Add<Output = T> + Clone,
 {
     type Output = Self;
-    #[inline] fn add(self, other: T) -> Self {
+    #[inline]
+    fn add(self, other: T) -> Self {
         self.add_scalar(other)
     }
 }
 
-impl <T, const R: usize, const C: usize> core::ops::Sub<T> for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> core::ops::Sub<T> for Matrix<T, R, C>
 where
-    T: core::ops::Sub<Output=T> + Clone,
+    T: core::ops::Sub<Output = T> + Clone,
 {
     type Output = Self;
-    #[inline] fn sub(self, other: T) -> Self {
+    #[inline]
+    fn sub(self, other: T) -> Self {
         self.sub_scalar(other)
     }
 }
 
-impl <T, const R: usize, const C: usize> core::ops::Mul<T> for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> core::ops::Mul<T> for Matrix<T, R, C>
 where
-    T: core::ops::Mul<Output=T> + Clone,
+    T: core::ops::Mul<Output = T> + Clone,
 {
     type Output = Self;
-    #[inline] fn mul(self, other: T) -> Self {
+    #[inline]
+    fn mul(self, other: T) -> Self {
         self.mul_scalar(other)
     }
 }
 
-impl <T, const R: usize, const C: usize> core::ops::Div<T> for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> core::ops::Div<T> for Matrix<T, R, C>
 where
-    T: core::ops::Div<Output=T> + Clone,
+    T: core::ops::Div<Output = T> + Clone,
 {
     type Output = Self;
-    #[inline] fn div(self, other: T) -> Self {
+    #[inline]
+    fn div(self, other: T) -> Self {
         self.div_scalar(other)
     }
 }
 
 //addassign, scalar
-impl <T, const R: usize, const C: usize> Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> Matrix<T, R, C>
 where
     T: core::ops::AddAssign + Clone,
 {
-    #[inline] fn add_scalar_assign(&mut self, other: T) {
+    #[inline]
+    fn add_scalar_assign(&mut self, other: T) {
         for c in 0..C {
             self.columns[c] += other.clone();
         }
     }
 }
 
-impl <T, const R: usize, const C: usize> core::ops::AddAssign<T> for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> core::ops::AddAssign<T> for Matrix<T, R, C>
 where
     T: core::ops::AddAssign + Clone,
 {
-    #[inline] fn add_assign(&mut self, other: T) {
+    #[inline]
+    fn add_assign(&mut self, other: T) {
         self.add_scalar_assign(other);
     }
 }
 
 //subassign, scalar
 
-impl <T, const R: usize, const C: usize> Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> Matrix<T, R, C>
 where
     T: core::ops::SubAssign + Clone,
 {
-    #[inline] pub fn sub_scalar_assign(&mut self, other: T) {
+    #[inline]
+    pub fn sub_scalar_assign(&mut self, other: T) {
         for c in 0..C {
             self.columns[c] -= other.clone();
         }
     }
 }
 
-impl <T, const R: usize, const C: usize> core::ops::SubAssign<T> for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> core::ops::SubAssign<T> for Matrix<T, R, C>
 where
     T: core::ops::SubAssign + Clone,
 {
@@ -871,7 +941,7 @@ where
 }
 
 //map
-impl<T: Clone, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T: Clone, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Applies a function to each element of the matrix, returning a new matrix.
     ///
     /// # Arguments
@@ -902,14 +972,12 @@ impl<T: Clone, const R: usize, const C: usize> Matrix<T,R,C> {
             columns[c] = MaybeUninit::new(self.columns[c].clone().map(&mut f));
         }
         let c = unsafe { columns.map(|c| c.assume_init()) };
-        Self {
-            columns: c
-        }
+        Self { columns: c }
     }
 }
 
 //map_in_place
-impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Applies a function to each element of the matrix in place.
     ///
     /// # Arguments
@@ -940,8 +1008,9 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
 }
 
 //eq_approx
-impl<T, const R: usize, const C: usize> Matrix<T,R,C>
-where T: Clone + crate::types::sealed::Float
+impl<T, const R: usize, const C: usize> Matrix<T, R, C>
+where
+    T: Clone + crate::types::sealed::Float,
 {
     /// Tests if two matrices are approximately equal within a tolerance.
     ///
@@ -973,7 +1042,10 @@ where T: Clone + crate::types::sealed::Float
     /// ```
     pub fn eq_approx(self, other: Self, tolerance: T) -> bool {
         for c in 0..C {
-            if !self.columns[c].clone().eq_approx(other.columns[c].clone(), tolerance.clone()) {
+            if !self.columns[c]
+                .clone()
+                .eq_approx(other.columns[c].clone(), tolerance.clone())
+            {
                 return false;
             }
         }
@@ -982,7 +1054,7 @@ where T: Clone + crate::types::sealed::Float
 }
 
 //columns accessors
-impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
+impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Returns a reference to the column vectors of the matrix.
     ///
     /// Since the matrix uses column-major storage, this gives direct access
@@ -1005,7 +1077,8 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// assert_eq!(columns[1], Vector::new([2.0, 5.0]));
     /// assert_eq!(columns[2], Vector::new([3.0, 6.0]));
     /// ```
-    #[inline] pub fn columns(&self) -> &[Vector<T,R>; C] {
+    #[inline]
+    pub fn columns(&self) -> &[Vector<T, R>; C] {
         &self.columns
     }
 
@@ -1028,7 +1101,8 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// assert_eq!(*m.element_at(0, 1), 5.0);
     /// assert_eq!(*m.element_at(1, 1), 6.0);
     /// ```
-    #[inline] pub fn columns_mut(&mut self) -> &mut [Vector<T,R>; C] {
+    #[inline]
+    pub fn columns_mut(&mut self) -> &mut [Vector<T, R>; C] {
         &mut self.columns
     }
 
@@ -1056,7 +1130,8 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// assert_eq!(*m.element_at(0, 0), 1.0);
     /// assert_eq!(*m.element_at(1, 2), 6.0);
     /// ```
-    #[inline] pub fn element_at(&self, row: usize, col: usize) -> &T {
+    #[inline]
+    pub fn element_at(&self, row: usize, col: usize) -> &T {
         &self.columns[col][row]
     }
 
@@ -1084,14 +1159,17 @@ impl<T, const R: usize, const C: usize> Matrix<T,R,C> {
     /// *m.element_at_mut(0, 1) = 10.0;
     /// assert_eq!(*m.element_at(0, 1), 10.0);
     /// ```
-    #[inline] pub fn element_at_mut(&mut self, row: usize, col: usize) -> &mut T {
+    #[inline]
+    pub fn element_at_mut(&mut self, row: usize, col: usize) -> &mut T {
         &mut self.columns[col][row]
     }
 }
 
 //row accessor
-impl<T, const R: usize, const C: usize> Matrix<T,R,C>
-where T: Clone {
+impl<T, const R: usize, const C: usize> Matrix<T, R, C>
+where
+    T: Clone,
+{
     /// Returns the rows of the matrix as an array of vectors.
     ///
     /// Since the matrix uses column-major storage internally, this method
@@ -1113,13 +1191,13 @@ where T: Clone {
     /// assert_eq!(rows[0], Vector::new([1.0, 2.0, 3.0]));
     /// assert_eq!(rows[1], Vector::new([4.0, 5.0, 6.0]));
     /// ```
-    #[inline] pub fn rows(self) -> [Vector<T, C>; R] {
+    #[inline]
+    pub fn rows(self) -> [Vector<T, C>; R] {
         self.transpose().columns
     }
 }
 
-
-impl <T, const R: usize, const C: usize> Debug for Matrix<T,R,C>
+impl<T, const R: usize, const C: usize> Debug for Matrix<T, R, C>
 where
     T: Debug,
 {
@@ -1140,8 +1218,9 @@ where
 
 //matrix multiplication
 
-impl <T, const M: usize, const N: usize> Matrix<T,M,N>
-where T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
+impl<T, const M: usize, const N: usize> Matrix<T, M, N>
+where
+    T: Clone + core::ops::Mul<Output = T> + core::ops::Add<Output = T>,
 {
     /// Performs matrix multiplication with another matrix.
     ///
@@ -1192,21 +1271,23 @@ where T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
     pub fn mul_matrix<const P: usize>(self, other: Matrix<T, N, P>) -> Matrix<T, M, P> {
         let mut out = Matrix::UNINIT;
         let a_rows = self.transpose();
-        for c in 0..P { //columns of output
+        for c in 0..P {
+            //columns of output
             let b_column = other.columns[c].clone();
             for r in 0..M {
-                out.columns[c][r] = MaybeUninit::new(a_rows.columns[r].clone().dot(b_column.clone()));
+                out.columns[c][r] =
+                    MaybeUninit::new(a_rows.columns[r].clone().dot(b_column.clone()));
             }
         }
 
-        unsafe{out.assume_init()}
-
+        unsafe { out.assume_init() }
     }
 }
 
-impl<T, const M: usize, const N: usize,const P: usize> core::ops::Mul<Matrix<T, N, P>> for Matrix<T, M, N>
+impl<T, const M: usize, const N: usize, const P: usize> core::ops::Mul<Matrix<T, N, P>>
+    for Matrix<T, M, N>
 where
-    T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
+    T: Clone + core::ops::Mul<Output = T> + core::ops::Add<Output = T>,
 {
     type Output = Matrix<T, M, P>;
     #[inline]
@@ -1217,7 +1298,7 @@ where
 
 impl<T, const R: usize, const C: usize> core::ops::Mul<Vector<T, C>> for Matrix<T, R, C>
 where
-    T: Clone + core::ops::Mul<Output=T> + core::ops::Add<Output=T>
+    T: Clone + core::ops::Mul<Output = T> + core::ops::Add<Output = T>,
 {
     type Output = Matrix<T, R, 1>;
     #[inline]
@@ -1228,47 +1309,47 @@ where
 
 //boilerplate
 
-impl<T: Default, const R: usize, const C: usize> Default for Matrix<T,R,C> where T: Copy {
+impl<T: Default, const R: usize, const C: usize> Default for Matrix<T, R, C>
+where
+    T: Copy,
+{
     fn default() -> Self {
         Self::new_columns([Default::default(); C])
     }
 }
 
 //from/into
-impl<T, const R: usize, const C: usize> From<[Vector<T,R>; C]> for Matrix<T,R,C> {
-    fn from(arr: [Vector<T,R>; C]) -> Self {
+impl<T, const R: usize, const C: usize> From<[Vector<T, R>; C]> for Matrix<T, R, C> {
+    fn from(arr: [Vector<T, R>; C]) -> Self {
         Self::new_columns(arr)
     }
 }
 
-impl<T, const R: usize, const C: usize> From<Matrix<T,R,C>> for [Vector<T,R>; C] {
-    fn from(m: Matrix<T,R,C>) -> Self {
+impl<T, const R: usize, const C: usize> From<Matrix<T, R, C>> for [Vector<T, R>; C] {
+    fn from(m: Matrix<T, R, C>) -> Self {
         m.columns
     }
 }
 
 //asref / asmut
-impl<T, const R: usize, const C: usize> AsRef<[Vector<T,R>; C]> for Matrix<T,R,C> {
-    fn as_ref(&self) -> &[Vector<T,R>; C] {
+impl<T, const R: usize, const C: usize> AsRef<[Vector<T, R>; C]> for Matrix<T, R, C> {
+    fn as_ref(&self) -> &[Vector<T, R>; C] {
         &self.columns
     }
 }
 
-impl<T, const R: usize, const C: usize> AsMut<[Vector<T,R>; C]> for Matrix<T,R,C> {
-    fn as_mut(&mut self) -> &mut [Vector<T,R>; C] {
+impl<T, const R: usize, const C: usize> AsMut<[Vector<T, R>; C]> for Matrix<T, R, C> {
+    fn as_mut(&mut self) -> &mut [Vector<T, R>; C] {
         &mut self.columns
     }
 }
 
-
-
-
-
 #[cfg(test)]
 mod tests {
-    #[test] fn test() {
-        use crate::vector::Vector;
+    #[test]
+    fn test() {
         use crate::matrix::Matrix;
+        use crate::vector::Vector;
         let m = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
@@ -1278,32 +1359,35 @@ mod tests {
         assert_eq!(m.columns[2], Vector::new([3.0, 6.0]));
     }
 
-    #[test] fn test_from_array() {
-        use crate::vector::Vector;
+    #[test]
+    fn test_from_array() {
         use crate::matrix::Matrix;
-        let m = Matrix::<f32, 2, 3>::new_from_array([
-            1.0, 2.0, 3.0,
-            4.0, 5.0, 6.0,
-        ]);
+        use crate::vector::Vector;
+        let m = Matrix::<f32, 2, 3>::new_from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
         assert_eq!(m.columns[0], Vector::new([1.0, 4.0]));
         assert_eq!(m.columns[1], Vector::new([2.0, 5.0]));
         assert_eq!(m.columns[2], Vector::new([3.0, 6.0]));
     }
-    #[test] fn test_debug() {
-        use crate::vector::Vector;
+    #[test]
+    fn test_debug() {
         use crate::matrix::Matrix;
+        use crate::vector::Vector;
         let m = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
         ]);
         use alloc::format;
         // println!("{:?}", m);
-        assert_eq!(format!("{:?}", m), "   1.000   2.000   3.000\n   4.000   5.000   6.000\n");
+        assert_eq!(
+            format!("{:?}", m),
+            "   1.000   2.000   3.000\n   4.000   5.000   6.000\n"
+        );
     }
 
-    #[test] fn test_elementwise() {
-        use crate::vector::Vector;
+    #[test]
+    fn test_elementwise() {
         use crate::matrix::Matrix;
+        use crate::vector::Vector;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
@@ -1318,20 +1402,27 @@ mod tests {
         ]);
         assert_eq!(m1 + m2, m3);
         assert_eq!(m3 - m2, m1);
-        assert_eq!(m1.elementwise_mul(m2), Matrix::new_rows([
-            Vector::new([7.0, 16.0, 27.0]),
-            Vector::new([40.0, 55.0, 72.0]),
-        ]));
+        assert_eq!(
+            m1.elementwise_mul(m2),
+            Matrix::new_rows([
+                Vector::new([7.0, 16.0, 27.0]),
+                Vector::new([40.0, 55.0, 72.0]),
+            ])
+        );
 
-        assert_eq!(m3.elementwise_div(m2), Matrix::new_rows([
-            Vector::new([8.0/7.0, 10.0/8.0, 12.0/9.0]),
-            Vector::new([14.0/10.0, 16.0/11.0, 18.0/12.0]),
-        ]));
+        assert_eq!(
+            m3.elementwise_div(m2),
+            Matrix::new_rows([
+                Vector::new([8.0 / 7.0, 10.0 / 8.0, 12.0 / 9.0]),
+                Vector::new([14.0 / 10.0, 16.0 / 11.0, 18.0 / 12.0]),
+            ])
+        );
     }
 
-    #[test] fn map() {
-        use crate::vector::Vector;
+    #[test]
+    fn map() {
         use crate::matrix::Matrix;
+        use crate::vector::Vector;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
@@ -1343,20 +1434,32 @@ mod tests {
         assert_eq!(m1.map(|v| v * 2.0), m2);
     }
 
-    #[test] fn rows_cols() {
-        use crate::vector::Vector;
+    #[test]
+    fn rows_cols() {
         use crate::matrix::Matrix;
+        use crate::vector::Vector;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
         ]);
-        assert_eq!(m1.columns(), &[Vector::new([1.0, 4.0]), Vector::new([2.0, 5.0]), Vector::new([3.0, 6.0])]);
-        assert_eq!(m1.rows(), [Vector::new([1.0, 2.0, 3.0]), Vector::new([4.0, 5.0, 6.0])]);
+        assert_eq!(
+            m1.columns(),
+            &[
+                Vector::new([1.0, 4.0]),
+                Vector::new([2.0, 5.0]),
+                Vector::new([3.0, 6.0])
+            ]
+        );
+        assert_eq!(
+            m1.rows(),
+            [Vector::new([1.0, 2.0, 3.0]), Vector::new([4.0, 5.0, 6.0])]
+        );
     }
 
-    #[test] fn test_mul() {
-        use crate::vector::Vector;
+    #[test]
+    fn test_mul() {
         use crate::matrix::Matrix;
+        use crate::vector::Vector;
         let m1 = Matrix::<f32, 2, 3>::new_rows([
             Vector::new([1.0, 2.0, 3.0]),
             Vector::new([4.0, 5.0, 6.0]),
@@ -1366,10 +1469,8 @@ mod tests {
             Vector::new([9.0, 10.0]),
             Vector::new([11.0, 12.0]),
         ]);
-        let m3 = Matrix::<f32, 2, 2>::new_rows([
-            Vector::new([58.0, 64.0]),
-            Vector::new([139.0, 154.0]),
-        ]);
+        let m3 =
+            Matrix::<f32, 2, 2>::new_rows([Vector::new([58.0, 64.0]), Vector::new([139.0, 154.0])]);
         assert_eq!(m1.clone() * m2.clone(), m3);
         assert_eq!(m1.clone().mul_matrix(m2), m3);
     }

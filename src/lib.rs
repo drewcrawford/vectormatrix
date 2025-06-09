@@ -47,8 +47,6 @@ extern crate std; // Explicitly import std when enabled
 
 extern crate alloc;
 
-pub mod vector;
-mod types;
 pub mod matrix;
-
-
+mod types;
+pub mod vector;

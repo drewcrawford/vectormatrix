@@ -19,15 +19,14 @@ impl<T: Constants> Matrix<T, 3, 3> {
     | 0 0 1  |
     ```
     */
-    #[inline] pub const fn translation_matrix(dx: T, dy: T) -> Self {
+    #[inline]
+    pub const fn translation_matrix(dx: T, dy: T) -> Self {
         Matrix::new_columns([
             Vector::new([T::ONE, T::ZERO, T::ZERO]),
             Vector::new([T::ZERO, T::ONE, T::ZERO]),
             Vector::new([dx, dy, T::ONE]),
         ])
     }
-
-
 
     /**
     Constructs a 3x3 matrix that applies a counterclockwise rotation of `theta` radians.
@@ -40,7 +39,10 @@ impl<T: Constants> Matrix<T, 3, 3> {
     ```
     */
 
-    pub fn rotation_matrix(theta: T) -> Self where T: Float + core::ops::Neg<Output=T> + Clone {
+    pub fn rotation_matrix(theta: T) -> Self
+    where
+        T: Float + core::ops::Neg<Output = T> + Clone,
+    {
         let s = theta.clone().sin();
         let c = theta.cos();
         Matrix::new_columns([
@@ -49,8 +51,6 @@ impl<T: Constants> Matrix<T, 3, 3> {
             Vector::new([T::ZERO, T::ZERO, T::ONE]),
         ])
     }
-
-
 
     /**
     Constructs a 3x3 matrix that applies a scaling operation.
@@ -62,14 +62,14 @@ impl<T: Constants> Matrix<T, 3, 3> {
     | 0 0 1 |
     ```
     */
-    #[inline] pub const fn scaling_matrix(sx: T, sy: T) -> Self {
+    #[inline]
+    pub const fn scaling_matrix(sx: T, sy: T) -> Self {
         Matrix::new_columns([
             Vector::new([sx, T::ZERO, T::ZERO]),
             Vector::new([T::ZERO, sy, T::ZERO]),
             Vector::new([T::ZERO, T::ZERO, T::ONE]),
         ])
     }
-
 
     /**
     Constructs a 3x3 matrix that applies a shear operation.
@@ -81,7 +81,8 @@ impl<T: Constants> Matrix<T, 3, 3> {
     | 0  0  1 |
     ```
     */
-    #[inline] pub const fn shear_matrix(sx: T, sy: T) -> Self {
+    #[inline]
+    pub const fn shear_matrix(sx: T, sy: T) -> Self {
         Matrix::new_columns([
             Vector::new([T::ONE, sy, T::ZERO]),
             Vector::new([sx, T::ONE, T::ZERO]),
@@ -92,7 +93,14 @@ impl<T: Constants> Matrix<T, 3, 3> {
     /**
     Finds the determinant of the matrix.
     */
-    #[inline] pub fn determinant(self) -> T where T: Clone + core::ops::Sub<Output=T> + core::ops::Mul<Output=T> + core::ops::Add<Output=T> {
+    #[inline]
+    pub fn determinant(self) -> T
+    where
+        T: Clone
+            + core::ops::Sub<Output = T>
+            + core::ops::Mul<Output = T>
+            + core::ops::Add<Output = T>,
+    {
         let a = self.columns()[0].x().clone();
         let b = self.columns()[1].x().clone();
         let c = self.columns()[2].x().clone();
@@ -102,18 +110,31 @@ impl<T: Constants> Matrix<T, 3, 3> {
         let g = self.columns()[0].z().clone();
         let h = self.columns()[1].z().clone();
         let i = self.columns()[2].z().clone();
-        a.clone() * e.clone() * i.clone() + b.clone() * f.clone() * g.clone() + c.clone() * d.clone() * h.clone() - c * e * g - b * d * i - a * f * h
+        a.clone() * e.clone() * i.clone()
+            + b.clone() * f.clone() * g.clone()
+            + c.clone() * d.clone() * h.clone()
+            - c * e * g
+            - b * d * i
+            - a * f * h
     }
 
     /**
     Finds the inverse of the matrix.
     */
-    pub fn inverse(self) -> Option<Self> where T: Clone + core::ops::Div<Output=T> + core::ops::Mul<Output=T> + core::ops::Sub<Output=T> + core::ops::Add<Output=T> + core::ops::Neg<Output=T> + PartialEq  {
+    pub fn inverse(self) -> Option<Self>
+    where
+        T: Clone
+            + core::ops::Div<Output = T>
+            + core::ops::Mul<Output = T>
+            + core::ops::Sub<Output = T>
+            + core::ops::Add<Output = T>
+            + core::ops::Neg<Output = T>
+            + PartialEq,
+    {
         let det = self.clone().determinant();
         if det == T::ZERO {
             None
-        }
-        else {
+        } else {
             let det_inverse = T::ONE / det;
             let a = self.columns()[0].x().clone();
             let b = self.columns()[1].x().clone();
@@ -133,20 +154,20 @@ impl<T: Constants> Matrix<T, 3, 3> {
             let m_g = b.clone() * f.clone() - c.clone() * e.clone();
             let m_h = -(a.clone() * f - c * d.clone());
             let m_i = a * e - b * d;
-            let m  = Matrix::new_columns([
-                                             Vector::new([m_a, m_b, m_c]),
-                                             Vector::new([m_d, m_e, m_f]),
-                                             Vector::new([m_g, m_h, m_i]),
-                                                         ]);
+            let m = Matrix::new_columns([
+                Vector::new([m_a, m_b, m_c]),
+                Vector::new([m_d, m_e, m_f]),
+                Vector::new([m_g, m_h, m_i]),
+            ]);
             Some(m * det_inverse)
-
         }
     }
-
 }
 
-#[cfg(test)] mod tests {
-    #[test] fn test_determinant() {
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_determinant() {
         let m = crate::matrix::Matrix::new_columns([
             crate::vector::Vector::new([3, 7, 0]),
             crate::vector::Vector::new([1, -4, 0]),
@@ -155,19 +176,21 @@ impl<T: Constants> Matrix<T, 3, 3> {
         assert_eq!(m.determinant(), -19);
     }
 
-    #[test] fn inverse() {
+    #[test]
+    fn inverse() {
         let m = crate::matrix::Matrix::new_columns([
             crate::vector::Vector::new([3.0f32, 7.0, 0.0]),
             crate::vector::Vector::new([1.0, -4.0, 0.0]),
             crate::vector::Vector::new([0.0, 0.0, 1.0]),
         ]);
         let inv = m.inverse().unwrap();
-        assert_eq!(inv, crate::matrix::Matrix::new_columns([
-            crate::vector::Vector::new([4.0/19.0, 7.0/19.0, 0.0]),
-            crate::vector::Vector::new([1.0/19.0, -3.0/19.0, 0.0]),
-            crate::vector::Vector::new([0.0, 0.0, 1.0]),
-        ]));
+        assert_eq!(
+            inv,
+            crate::matrix::Matrix::new_columns([
+                crate::vector::Vector::new([4.0 / 19.0, 7.0 / 19.0, 0.0]),
+                crate::vector::Vector::new([1.0 / 19.0, -3.0 / 19.0, 0.0]),
+                crate::vector::Vector::new([0.0, 0.0, 1.0]),
+            ])
+        );
     }
-
-
 }
