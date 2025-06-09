@@ -1284,6 +1284,8 @@ impl <T, const N: usize, const M: usize> core::ops::Mul<Matrix<T, M, N>> for Vec
 
 
 //NormalizedVector boilerplate
+
+// From/Into implementations
 impl<T, const N: usize> From<Vector<T, N>> for NormalizedVector<T, N> where T: core::ops::Add<Output=T> + Clone + core::ops::Div<Output=T> + core::ops::Mul<Output=T> + Float {
     ///Converts to NormalizedVector by normalizing the vector.
     fn from(value: Vector<T, N>) -> Self {
@@ -1298,13 +1300,22 @@ impl<T, const N: usize> From<NormalizedVector<T, N>> for Vector<T, N> {
     }
 }
 
+// AsRef implementation (no AsMut since this would break normalization)
 impl<T, const N: usize> AsRef<Vector<T, N>> for NormalizedVector<T, N> {
     ///Returns a reference to the underlying vector.
     fn as_ref(&self) -> &Vector<T, N> {
         self.as_vector()
     }
 }
-//no support for asmut since this breaks normalization.
+
+// Deref for convenient access to Vector methods (no DerefMut to preserve normalization)
+impl<T, const N: usize> core::ops::Deref for NormalizedVector<T, N> {
+    type Target = Vector<T, N>;
+    
+    fn deref(&self) -> &Self::Target {
+        self.as_vector()
+    }
+}
 
 
 
