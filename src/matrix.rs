@@ -263,6 +263,7 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
     /// assert_eq!(*transposed.element_at(1, 0), 2.0);
     /// assert_eq!(*transposed.element_at(2, 1), 6.0);
     /// ```
+    #[inline]
     pub fn transpose(self) -> Matrix<T, C, R>
     where
         T: Clone,
@@ -1273,14 +1274,33 @@ where
     #[inline]
     pub fn mul_matrix<const P: usize>(self, other: Matrix<T, N, P>) -> Matrix<T, M, P> {
         let mut out = Matrix::UNINIT;
-        let a_rows = self.transpose();
-        for c in 0..P {
-            //columns of output
-            let b_column = other.columns[c].clone();
-            for r in 0..M {
-                out.columns[c][r] =
-                    MaybeUninit::new(a_rows.columns[r].clone().dot(b_column.clone()));
+        // c = output‐column index
+        //avoid for pattern  here as iterators are expensive in debug builds
+        let mut c = 0;
+        while c < P {
+            // r = output‐row index
+            let mut r = 0;
+            while r < M {
+                // compute dot product of row `r` of `self` with column `c` of `other`
+                // since self.columns[k][r] is element (r, k),
+                // and other.columns[c][k] is element (k, c)
+                let mut acc = {
+                    // start with k = 0
+                    let a = self.columns[0][r].clone();
+                    let b = other.columns[c][0].clone();
+                    a * b
+                };
+                let mut k = 1;
+                while k < N {
+                    let a = self.columns[k][r].clone();
+                    let b = other.columns[c][k].clone();
+                    acc = acc + a * b;
+                    k+=1;
+                }
+                out.columns[c][r] = MaybeUninit::new(acc);
+                r+= 1;
             }
+            c += 1;
         }
 
         unsafe { out.assume_init() }
