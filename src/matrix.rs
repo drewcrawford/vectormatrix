@@ -318,7 +318,10 @@ impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>, R, C> {
     /// assert_eq!(*initialized.element_at(1, 1), 3.0);
     /// ```
     pub unsafe fn assume_init(self) -> Matrix<T, R, C> {
-        let columns = self.columns.map(|maybe| unsafe { maybe.assume_init() });
+        
+        let columns = unsafe {
+            std::ptr::read(self.columns.as_ptr() as *const [Vector<T, R>; C])
+        };
         Matrix { columns }
     }
 }
