@@ -267,16 +267,19 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
     where
         T: Clone,
     {
-        let mut columns = [const { MaybeUninit::uninit() }; R];
-        for (r, column_slot) in columns.iter_mut().enumerate().take(R) {
+        let mut columns: [MaybeUninit<Vector<T,C>>; R] = [const { MaybeUninit::uninit() }; R];
+        for r in 0..R {
             let mut column = Vector::UNINIT;
             for c in 0..C {
                 column[c] = MaybeUninit::new(self.columns[c][r].clone());
             }
             let column = unsafe { column.assume_init() };
-            *column_slot = MaybeUninit::new(column);
+            *&mut columns[r] = MaybeUninit::new(column);
         }
-        let arr: [Vector<T, C>; R] = columns.map(|maybe| unsafe { maybe.assume_init() });
+        // SAFETY: We are reading from a MaybeUninit array that we just filled with initialized data.
+        let arr: [Vector<T, C>; R] = unsafe {
+            std::ptr::read(columns.as_ptr() as *const [Vector<T, C>; R])
+        };
         Matrix { columns: arr }
     }
 }

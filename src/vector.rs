@@ -869,7 +869,12 @@ where
     #[inline]
     pub unsafe fn assume_init(self) -> Vector<T, N> {
         let inner = self.0;
-        let arr: [T; N] = inner.map(|maybe| unsafe { maybe.assume_init() });
+        //transmute to T
+        //This is faster than using `MaybeUninit::assume_init` on each element
+        // SAFETY: All elements of `columns` have been initialized.
+        let arr = unsafe {
+            std::ptr::read(inner.as_ptr() as *const [T; N])
+        };
         Vector(arr)
     }
 }
