@@ -58,6 +58,7 @@ use crate::types::sealed::Constants;
 use crate::vector::Vector;
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
+use std::ops::{AddAssign, Mul};
 
 /// A mathematical matrix with `R` rows and `C` columns.
 ///
@@ -1297,6 +1298,50 @@ where
                 while k < N {
                     let a = self.columns[k][r].clone();
                     let b = other.columns[c][k].clone();
+                    acc = acc + a * b;
+                    k+=1;
+                }
+                out.columns[c][r] = MaybeUninit::new(acc);
+                r+= 1;
+            }
+            c += 1;
+        }
+
+        unsafe { out.assume_init() }
+    }
+
+    /**
+    This is slightly more efficient than `mul_matrix` in Debug builds.
+    */
+    #[inline]
+    pub fn mul_matrix_copy<const P: usize>(
+        self,
+        other: Matrix<T, N, P>,
+    ) -> Matrix<T, M, P>
+    where
+        T: Copy + AddAssign + Mul<Output = T> + Default,
+    {
+        let mut out = Matrix::UNINIT;
+        // c = output‐column index
+        //avoid for pattern  here as iterators are expensive in debug builds
+        let mut c = 0;
+        while c < P {
+            // r = output‐row index
+            let mut r = 0;
+            while r < M {
+                // compute dot product of row `r` of `self` with column `c` of `other`
+                // since self.columns[k][r] is element (r, k),
+                // and other.columns[c][k] is element (k, c)
+                let mut acc = {
+                    // start with k = 0
+                    let a = self.columns[0][r];
+                    let b = other.columns[c][0];
+                    a * b
+                };
+                let mut k = 1;
+                while k < N {
+                    let a = self.columns[k][r];
+                    let b = other.columns[c][k];
                     acc = acc + a * b;
                     k+=1;
                 }

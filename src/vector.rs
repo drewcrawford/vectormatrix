@@ -368,10 +368,16 @@ impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn elementwise_add(self, other: Self) -> Self {
-        let mut result = self.0.clone();
-        for (i, result_item) in result.iter_mut().enumerate().take(N) {
-            *result_item = result_item.clone() + other.0[i].clone();
+        let mut result = [const { MaybeUninit::<T>::uninit()}; N];
+        let mut n = 0;
+        while n < N {
+            result[n] = MaybeUninit::new(self.0[n].clone() + other.0[n].clone());
+            n += 1;
         }
+        // SAFETY: All elements are initialized by the loop above
+        let result: [T; N] = unsafe {
+            std::ptr::read(result.as_ptr() as *const [T; N])
+        };
         Self(result)
     }
 }
@@ -430,10 +436,16 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn elementwise_mul(self, other: Self) -> Self {
-        let mut result = self.0.clone();
-        for (i, result_item) in result.iter_mut().enumerate().take(N) {
-            *result_item = result_item.clone() * other.0[i].clone();
+        let mut result = [const { MaybeUninit::uninit() }; N];
+        let mut n = 0;
+        while n < N {
+            result[n] = MaybeUninit::new(self.0[n].clone() * other.0[n].clone());
+            n+=1;
         }
+        // SAFETY: All elements are initialized by the loop above
+        let result: [T; N] = unsafe {
+            std::ptr::read(result.as_ptr() as *const [T; N])
+        };
         Self(result)
     }
 }
@@ -620,7 +632,17 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn mul_scalar(self, other: T) -> Self {
-        Self(self.0.map(|x| x * other.clone()))
+        let mut result = [const { MaybeUninit::uninit() }; N];
+        let mut n = 0;
+        while n < N {
+            result[n] = MaybeUninit::new(self.0[n].clone() * other.clone());
+            n += 1;
+        }
+        // SAFETY: All elements are initialized by the loop above
+        let result: [T; N] = unsafe {
+            std::ptr::read(result.as_ptr() as *const [T; N])
+        };
+        Self(result)
     }
 }
 
