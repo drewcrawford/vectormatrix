@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! Mathematical vector types for linear algebra operations.
 //!
 //! This module provides a generic `Vector<T, N>` type that represents an N-dimensional
