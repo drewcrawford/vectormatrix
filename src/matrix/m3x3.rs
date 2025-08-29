@@ -4,7 +4,7 @@
 */
 
 use crate::matrix::Matrix;
-use crate::types::sealed::{Constants};
+use crate::types::sealed::Constants;
 #[cfg(feature = "std")]
 use crate::types::sealed::Float;
 use crate::vector::Vector;
