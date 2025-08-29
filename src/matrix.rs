@@ -1307,7 +1307,7 @@ where
     }
 
     /**
-    This is slightly more efficient than [`self.mul_matrix`] in Debug builds.
+    This is slightly more efficient than [`Self::mul_matrix`] in Debug builds.
     */
     #[inline]
     pub fn mul_matrix_copy<const P: usize>(self, other: Matrix<T, N, P>) -> Matrix<T, M, P>
