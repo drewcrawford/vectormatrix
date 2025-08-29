@@ -4,7 +4,9 @@
 */
 
 use crate::matrix::Matrix;
-use crate::types::sealed::{Constants, Float};
+use crate::types::sealed::{Constants};
+#[cfg(feature = "std")]
+use crate::types::sealed::Float;
 use crate::vector::Vector;
 
 impl<T: Constants> Matrix<T, 3, 3> {
@@ -38,6 +40,7 @@ impl<T: Constants> Matrix<T, 3, 3> {
     | 0           0          1 |
     ```
     */
+    #[cfg(feature = "std")]
     pub fn rotation_matrix(theta: T) -> Self
     where
         T: Float + core::ops::Neg<Output = T> + Clone,

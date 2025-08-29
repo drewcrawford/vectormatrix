@@ -58,7 +58,7 @@ use crate::types::sealed::Constants;
 use crate::vector::Vector;
 use core::fmt::Debug;
 use core::mem::MaybeUninit;
-use std::ops::{AddAssign, Mul};
+use core::ops::{AddAssign, Mul};
 
 /// A mathematical matrix with `R` rows and `C` columns.
 ///
@@ -280,7 +280,7 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
         }
         // SAFETY: We are reading from a MaybeUninit array that we just filled with initialized data.
         let arr: [Vector<T, C>; R] =
-            unsafe { std::ptr::read(columns.as_ptr() as *const [Vector<T, C>; R]) };
+            unsafe { core::ptr::read(columns.as_ptr() as *const [Vector<T, C>; R]) };
         Matrix { columns: arr }
     }
 }
@@ -318,7 +318,7 @@ impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>, R, C> {
     /// assert_eq!(*initialized.element_at(1, 1), 3.0);
     /// ```
     pub unsafe fn assume_init(self) -> Matrix<T, R, C> {
-        let columns = unsafe { std::ptr::read(self.columns.as_ptr() as *const [Vector<T, R>; C]) };
+        let columns = unsafe { core::ptr::read(self.columns.as_ptr() as *const [Vector<T, R>; C]) };
         Matrix { columns }
     }
 }

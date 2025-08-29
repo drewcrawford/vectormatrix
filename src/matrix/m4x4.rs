@@ -4,7 +4,10 @@
  */
 
 use crate::matrix::Matrix;
-use crate::types::sealed::{Constants, Float};
+use crate::types::sealed::{Constants};
+#[cfg(feature = "std")]
+use crate::types::sealed::Float;
+
 use crate::vector::Vector;
 
 impl<T> Matrix<T, 4, 4> {
@@ -45,6 +48,7 @@ impl<T> Matrix<T, 4, 4> {
     ```
     */
     #[inline]
+    #[cfg(feature = "std")]
     pub fn rotation_matrix_x(theta: T) -> Self
     where
         T: Float + core::ops::Neg<Output = T> + Clone + Constants,
@@ -71,6 +75,7 @@ impl<T> Matrix<T, 4, 4> {
     ```
     */
     #[inline]
+    #[cfg(feature = "std")]
     pub fn rotation_matrix_y(theta: T) -> Self
     where
         T: Float + core::ops::Neg<Output = T> + Clone + Constants,
@@ -97,6 +102,7 @@ impl<T> Matrix<T, 4, 4> {
     ```
     */
     #[inline]
+    #[cfg(feature = "std")]
     pub fn rotation_matrix_z(theta: T) -> Self
     where
         T: Float + core::ops::Neg<Output = T> + Clone + Constants,

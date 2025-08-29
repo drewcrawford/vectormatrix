@@ -140,7 +140,8 @@ impl<T: Constants, const N: usize> Vector<T, N> {
 ///
 /// # Examples
 ///
-/// ```
+/// ```rust
+///# #[cfg(feature = "std")] {
 /// use vectormatrix::vector::Vector;
 ///
 /// let v = Vector::new([3.0f64, 4.0]);
@@ -149,6 +150,7 @@ impl<T: Constants, const N: usize> Vector<T, N> {
 /// // The normalized vector has length 1
 /// let length = normalized.as_vector().length();
 /// assert!((length - 1.0f64).abs() < 0.0001);
+/// # }
 /// ```
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct NormalizedVector<T, const N: usize>(Vector<T, N>);
@@ -159,11 +161,14 @@ impl<T, const N: usize> NormalizedVector<T, N> {
     /// # Examples
     ///
     /// ```
+    /// #[cfg(feature = "std")]
+    /// # {
     /// use vectormatrix::vector::Vector;
     ///
     /// let v = Vector::new([3.0, 4.0]);
     /// let normalized = v.normalize();
     /// let vector_back = normalized.into_vector();
+    /// # }
     /// ```
     #[inline]
     pub fn into_vector(self) -> Vector<T, N> {
@@ -175,12 +180,15 @@ impl<T, const N: usize> NormalizedVector<T, N> {
     /// # Examples
     ///
     /// ```
+    /// #[cfg(feature = "std")]
+    /// # {
     /// use vectormatrix::vector::Vector;
     ///
     /// let v = Vector::new([3.0, 4.0]);
     /// let normalized = v.normalize();
     /// let vec_ref = normalized.as_vector();
     /// assert_eq!(vec_ref, &normalized.into_vector());
+    /// # }
     /// ```
     #[inline]
     pub const fn as_vector(&self) -> &Vector<T, N> {
@@ -375,7 +383,7 @@ impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
             n += 1;
         }
         // SAFETY: All elements are initialized by the loop above
-        let result: [T; N] = unsafe { std::ptr::read(result.as_ptr() as *const [T; N]) };
+        let result: [T; N] = unsafe { core::ptr::read(result.as_ptr() as *const [T; N]) };
         Self(result)
     }
 }
@@ -441,7 +449,7 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
             n += 1;
         }
         // SAFETY: All elements are initialized by the loop above
-        let result: [T; N] = unsafe { std::ptr::read(result.as_ptr() as *const [T; N]) };
+        let result: [T; N] = unsafe { core::ptr::read(result.as_ptr() as *const [T; N]) };
         Self(result)
     }
 }
@@ -635,7 +643,7 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
             n += 1;
         }
         // SAFETY: All elements are initialized by the loop above
-        let result: [T; N] = unsafe { std::ptr::read(result.as_ptr() as *const [T; N]) };
+        let result: [T; N] = unsafe { core::ptr::read(result.as_ptr() as *const [T; N]) };
         Self(result)
     }
 }
@@ -801,6 +809,7 @@ impl<T: core::ops::Mul<Output = T> + Clone + core::ops::Add<Output = T> + Float,
     /// assert_eq!(v.length(), 5.0);
     /// ```
     #[inline]
+    #[cfg(feature = "std")]
     pub fn length(self) -> T {
         self.length_squared().sqrt()
     }
@@ -831,6 +840,7 @@ impl<
     /// assert!((distance - 7.0710678f32).abs() < 0.0001);
     /// ```
     #[inline]
+    #[cfg(feature = "std")]
     pub fn euclid_distance_to(self, other: Self) -> T {
         let mut result = self.0[0] - other.0[0];
         result = result * result;
@@ -867,6 +877,7 @@ impl<
     /// assert!((length - 1.0f64).abs() < 0.0001);
     /// ```
     #[inline]
+    #[cfg(feature = "std")]
     pub fn normalize(self) -> NormalizedVector<T, N> {
         NormalizedVector(self.clone() / self.length())
     }
@@ -888,7 +899,7 @@ where
         //transmute to T
         //This is faster than using `MaybeUninit::assume_init` on each element
         // SAFETY: All elements of `columns` have been initialized.
-        let arr = unsafe { std::ptr::read(inner.as_ptr() as *const [T; N]) };
+        let arr = unsafe { core::ptr::read(inner.as_ptr() as *const [T; N]) };
         Vector(arr)
     }
 }
@@ -1396,6 +1407,7 @@ where
 //NormalizedVector boilerplate
 
 // From/Into implementations
+#[cfg(feature = "std")]
 impl<T, const N: usize> From<Vector<T, N>> for NormalizedVector<T, N>
 where
     T: core::ops::Add<Output = T>
@@ -1514,12 +1526,14 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn length() {
         let a = Vector::new([3.0, 4.0]);
         assert_eq!(a.length(), 5.0);
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn euclid_distance() {
         let a = Vector::new([1.0, 2.0]);
         let b = Vector::new([4.0, 6.0]);
@@ -1527,6 +1541,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn normalize() {
         let a = Vector::new([3.0, 4.0]);
         let b = a.normalize();
