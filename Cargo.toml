@@ -1,6 +1,6 @@
 [package]
 name = "vectormatrix"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 authors = ["Drew Crawford <drew@sealedabstract.com>"]
 description = "Idiomatic Matrix and Vector types for Rust"

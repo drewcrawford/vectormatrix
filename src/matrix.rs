@@ -270,13 +270,13 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
         T: Clone,
     {
         let mut columns: [MaybeUninit<Vector<T,C>>; R] = [const { MaybeUninit::uninit() }; R];
-        for r in 0..R {
+        for (r, item) in columns.iter_mut().enumerate().take(R) {
             let mut column = Vector::UNINIT;
             for c in 0..C {
                 column[c] = MaybeUninit::new(self.columns[c][r].clone());
             }
             let column = unsafe { column.assume_init() };
-            *&mut columns[r] = MaybeUninit::new(column);
+            *item = MaybeUninit::new(column);
         }
         // SAFETY: We are reading from a MaybeUninit array that we just filled with initialized data.
         let arr: [Vector<T, C>; R] = unsafe {
@@ -1311,7 +1311,7 @@ where
     }
 
     /**
-    This is slightly more efficient than `mul_matrix` in Debug builds.
+    This is slightly more efficient than [`self.mul_matrix`] in Debug builds.
     */
     #[inline]
     pub fn mul_matrix_copy<const P: usize>(
@@ -1342,7 +1342,7 @@ where
                 while k < N {
                     let a = self.columns[k][r];
                     let b = other.columns[c][k];
-                    acc = acc + a * b;
+                    acc += a * b;
                     k+=1;
                 }
                 out.columns[c][r] = MaybeUninit::new(acc);
