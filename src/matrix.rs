@@ -269,7 +269,7 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
     where
         T: Clone,
     {
-        let mut columns: [MaybeUninit<Vector<T,C>>; R] = [const { MaybeUninit::uninit() }; R];
+        let mut columns: [MaybeUninit<Vector<T, C>>; R] = [const { MaybeUninit::uninit() }; R];
         for (r, item) in columns.iter_mut().enumerate().take(R) {
             let mut column = Vector::UNINIT;
             for c in 0..C {
@@ -279,9 +279,8 @@ impl<T, const R: usize, const C: usize> Matrix<T, R, C> {
             *item = MaybeUninit::new(column);
         }
         // SAFETY: We are reading from a MaybeUninit array that we just filled with initialized data.
-        let arr: [Vector<T, C>; R] = unsafe {
-            std::ptr::read(columns.as_ptr() as *const [Vector<T, C>; R])
-        };
+        let arr: [Vector<T, C>; R] =
+            unsafe { std::ptr::read(columns.as_ptr() as *const [Vector<T, C>; R]) };
         Matrix { columns: arr }
     }
 }
@@ -319,10 +318,7 @@ impl<T, const R: usize, const C: usize> Matrix<MaybeUninit<T>, R, C> {
     /// assert_eq!(*initialized.element_at(1, 1), 3.0);
     /// ```
     pub unsafe fn assume_init(self) -> Matrix<T, R, C> {
-        
-        let columns = unsafe {
-            std::ptr::read(self.columns.as_ptr() as *const [Vector<T, R>; C])
-        };
+        let columns = unsafe { std::ptr::read(self.columns.as_ptr() as *const [Vector<T, R>; C]) };
         Matrix { columns }
     }
 }
@@ -1299,10 +1295,10 @@ where
                     let a = self.columns[k][r].clone();
                     let b = other.columns[c][k].clone();
                     acc = acc + a * b;
-                    k+=1;
+                    k += 1;
                 }
                 out.columns[c][r] = MaybeUninit::new(acc);
-                r+= 1;
+                r += 1;
             }
             c += 1;
         }
@@ -1314,10 +1310,7 @@ where
     This is slightly more efficient than [`self.mul_matrix`] in Debug builds.
     */
     #[inline]
-    pub fn mul_matrix_copy<const P: usize>(
-        self,
-        other: Matrix<T, N, P>,
-    ) -> Matrix<T, M, P>
+    pub fn mul_matrix_copy<const P: usize>(self, other: Matrix<T, N, P>) -> Matrix<T, M, P>
     where
         T: Copy + AddAssign + Mul<Output = T> + Default,
     {
@@ -1343,10 +1336,10 @@ where
                     let a = self.columns[k][r];
                     let b = other.columns[c][k];
                     acc += a * b;
-                    k+=1;
+                    k += 1;
                 }
                 out.columns[c][r] = MaybeUninit::new(acc);
-                r+= 1;
+                r += 1;
             }
             c += 1;
         }

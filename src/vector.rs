@@ -368,16 +368,14 @@ impl<T: core::ops::Add<Output = T> + Clone, const N: usize> Vector<T, N> {
     /// ```
     #[inline]
     pub fn elementwise_add(self, other: Self) -> Self {
-        let mut result = [const { MaybeUninit::<T>::uninit()}; N];
+        let mut result = [const { MaybeUninit::<T>::uninit() }; N];
         let mut n = 0;
         while n < N {
             result[n] = MaybeUninit::new(self.0[n].clone() + other.0[n].clone());
             n += 1;
         }
         // SAFETY: All elements are initialized by the loop above
-        let result: [T; N] = unsafe {
-            std::ptr::read(result.as_ptr() as *const [T; N])
-        };
+        let result: [T; N] = unsafe { std::ptr::read(result.as_ptr() as *const [T; N]) };
         Self(result)
     }
 }
@@ -440,12 +438,10 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
         let mut n = 0;
         while n < N {
             result[n] = MaybeUninit::new(self.0[n].clone() * other.0[n].clone());
-            n+=1;
+            n += 1;
         }
         // SAFETY: All elements are initialized by the loop above
-        let result: [T; N] = unsafe {
-            std::ptr::read(result.as_ptr() as *const [T; N])
-        };
+        let result: [T; N] = unsafe { std::ptr::read(result.as_ptr() as *const [T; N]) };
         Self(result)
     }
 }
@@ -639,9 +635,7 @@ impl<T: core::ops::Mul<Output = T> + Clone, const N: usize> Vector<T, N> {
             n += 1;
         }
         // SAFETY: All elements are initialized by the loop above
-        let result: [T; N] = unsafe {
-            std::ptr::read(result.as_ptr() as *const [T; N])
-        };
+        let result: [T; N] = unsafe { std::ptr::read(result.as_ptr() as *const [T; N]) };
         Self(result)
     }
 }
@@ -894,9 +888,7 @@ where
         //transmute to T
         //This is faster than using `MaybeUninit::assume_init` on each element
         // SAFETY: All elements of `columns` have been initialized.
-        let arr = unsafe {
-            std::ptr::read(inner.as_ptr() as *const [T; N])
-        };
+        let arr = unsafe { std::ptr::read(inner.as_ptr() as *const [T; N]) };
         Vector(arr)
     }
 }
